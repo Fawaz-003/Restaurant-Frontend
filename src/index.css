@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Hide the built-in Edge/Chrome password reveal button */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+} 
+
+/* Also cover Chromium-based Edge */
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-inner-spin-button,
+input[type="password"]::-webkit-password-toggle-button {
+  display: none;
+}
