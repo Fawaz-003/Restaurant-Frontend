@@ -44,6 +44,7 @@ import { useAppContext } from "./Context/AppContext";
 import ProductDetail from "./Layout/ProductDetail";
 import AuthSuccess from "./Pages/Users/AuthSuccess";
 import Checkout from "./Pages/Checkout";
+import ShopMenu from "./Pages/ShopMenu";
 
 const App = () => {
   const location = useLocation();
@@ -72,6 +73,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+           <Route path="shop/:id" element={<ShopMenu />} />
         <Route path="/collections" element={<Collections setIsMobileFilterOpen={setIsMobileFilterOpen} />} />
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/contact" element={<Contact />} />
