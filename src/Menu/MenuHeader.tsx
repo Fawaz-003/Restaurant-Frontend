@@ -9,7 +9,7 @@ interface MenuHeaderProps {
   onSearchChange: (query: string) => void;
   onCategoryChange: (category: string) => void;
   onShowCart: () => void;
-  bestFoodItems: any[]; 
+  bestFoodItems: any[];
 }
 
 const MenuHeader: React.FC<MenuHeaderProps> = ({
@@ -19,7 +19,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
 }) => {
   const desktopBestFoodItems = bestFoodItems.slice(0, 4);
   const duplicatedDesktopBestFoodItems = [...desktopBestFoodItems, ...desktopBestFoodItems];
-  
+
   const duplicatedBestFoodItems = [...bestFoodItems, ...bestFoodItems];
 
   return (
@@ -38,7 +38,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
             {totalItems > 0 && (
               <span className="absolute top-1 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                 {totalItems}
-              </span> 
+              </span>
             )}
           </button>
         </div>
@@ -48,22 +48,22 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
             <div className="hidden lg:flex items-center justify-between mb-3">
               <h2 className="text-xl font-bold text-gray-800">Highly Recommended</h2>
             </div>
-            
+
             <div className="lg:hidden relative overflow-hidden p-1 rounded-xl">
-              <div className="flex animate-infinite-scroll-slow">
+              <div className="flex animate-infinite-scroll-slow gap-2">
                 {duplicatedBestFoodItems.map((item, index) => (
-                  <div 
+                  <div
                     key={`${item.id}-${index}`}
-                    className="flex items-center space-x-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer p-2 min-w-[160px] flex-shrink-0 mx-1"
+                    className="flex items-center space-x-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer p-2 min-w-[160px] flex-shrink-0"
                   >
                     <div className="w-10 h-10 rounded-md overflow-hidden flex-shrink-0">
-                      <img 
-                        src={item.image} 
+                      <img
+                        src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-xs text-gray-800 line-clamp-1 mb-1">
                         {item.name}
@@ -80,27 +80,26 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
                     </div>
                   </div>
                 ))}
-              </div>              
+              </div>
               <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white/80 to-transparent pointer-events-none"></div>
               <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white/80 to-transparent pointer-events-none"></div>
             </div>
 
             <div className="hidden lg:block relative overflow-hidden rounded-xl">
-              <div className="flex animate-infinite-scroll-desktop">
+              <div className="flex animate-infinite-scroll-desktop gap-4">
                 {duplicatedDesktopBestFoodItems.map((item, index) => (
-                  <div 
+                  <div
                     key={`${item.id}-desktop-${index}`}
-                    className="flex items-center bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer px-2 py-1 min-w-[180px] flex-shrink-0 border border-gray-200"
+                    className="flex items-center bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer px-3 py-2 min-w-[200px] flex-shrink-0 border border-gray-200"
                   >
-                    <div className="w-22 h-16 rounded-md overflow-hidden flex-shrink-0 mr-3">
-                      <img 
-                        src={item.image} 
+                    <div className="w-20 h-16 rounded-md overflow-hidden flex-shrink-0 mr-3">
+                      <img
+                        src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    
-                    {/* Content */}
+
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-sm text-gray-800 mb-1">
                         {item.name}
@@ -116,8 +115,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
                   </div>
                 ))}
               </div>
-              
-              {/* Gradient overlays for smooth edges */}
+
               <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/90 to-transparent pointer-events-none"></div>
               <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/90 to-transparent pointer-events-none"></div>
             </div>

@@ -8,6 +8,13 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { axios, navigate, backendURL } = useAppContext();
 
+  const getToastPosition = () => {
+    if (window.innerWidth < 768) {
+      return "top-center";
+    }
+    return "top-right";
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -23,8 +30,7 @@ const Register = () => {
       const data = res.data;
 
       toast.success(data.message, {
-        position: "top-right",
-        style: { margin: "50px" },
+        position: getToastPosition(),
       });
       navigate("/login");
       setForm({ name: "", email: "", password: "" });
@@ -32,8 +38,7 @@ const Register = () => {
       toast.error(
         err.response?.data?.message || err.message || "Registration failed",
         {
-          position: "top-right",
-          style: { margin: "50px" },
+          position: getToastPosition(),
         }
       );
 
@@ -42,18 +47,18 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="mx-3 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-5 px-4 shadow-sm rounded-lg sm:px-10 border border-gray-200">
+        <div className="bg-white py-5 px-4 sm:px-10 ">
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <h2 className="mt-5 text-center text-3xl font-bold tracking-tight text-gray-900">
-              Create your account
+            <h2 className="mt-5 text-center text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+              Sign-up
             </h2>
-            <p className="mt-2 mb-5 text-center text-sm text-gray-600">
-              Join us today! Please fill in your details to get started.
-            </p>
+          <p className="mt-2 text-center">
+            Create your account to get started.
+          </p>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 mt-6">
             {/* Name Field */}
             <div>
               <label
@@ -74,7 +79,7 @@ const Register = () => {
                   required
                   value={form.name}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                   placeholder="Enter your full name"
                 />
               </div>
@@ -100,7 +105,7 @@ const Register = () => {
                   required
                   value={form.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                   placeholder="Enter your email"
                 />
               </div>
@@ -126,7 +131,7 @@ const Register = () => {
                   required
                   value={form.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                   placeholder="Create a password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -148,60 +153,15 @@ const Register = () => {
               </p>
             </div>
 
-            {/* Terms and Conditions */}
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="terms"
-                  name="terms"
-                  type="checkbox"
-                  required
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="terms" className="text-gray-700">
-                  I agree to the{" "}
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
-                  >
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
-                  >
-                    Privacy Policy
-                  </a>
-                </label>
-              </div>
-            </div>
-
             {/* Create Account Button */}
             <div>
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600 transition duration-200"
               >
                 Create Account
               </button>
-            </div>
-
-            {/* Divider */}
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
-                    Or sign up with
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* Social Login Buttons */}
@@ -218,7 +178,7 @@ const Register = () => {
                   src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleFavicon.png"
                   alt="googleFavicon"
                 />
-                Log in with Google
+                Signup with Google
               </button>
             </div>
           </div>
@@ -230,9 +190,9 @@ const Register = () => {
                 Already have an account?{" "}
                 <a
                   href="/login"
-                  className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
+                  className="font-medium text-orange-600 hover:text-orange-500 transition duration-200"
                 >
-                  Sign in here
+                  Login
                 </a>
               </span>
             </div>

@@ -50,9 +50,16 @@ const App = () => {
   const location = useLocation();
   const { axios } = useAppContext();
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const hideNavAndFooter = location.pathname.startsWith("/admin");
+  
+  const hideNavAndFooter = 
+    location.pathname.startsWith("/admin") ||
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
   const hideBottomNav =
     location.pathname.startsWith("/admin") ||
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
     isMobileFilterOpen;
 
   useEffect(() => {
@@ -62,25 +69,29 @@ const App = () => {
       .catch((err) => console.log("Pre-warm failed:", err));
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     document.body.style.overflow = isMobileFilterOpen ? "hidden" : "auto";
   }, [isMobileFilterOpen]);
 
   return (
     <div className="relative min-h-screen pb-16">
       {!hideNavAndFooter && <Navbar />}
+      
       <ToastContainer limit={3} />
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-           <Route path="shop/:id" element={<ShopMenu />} />
+        <Route path="shop/:id" element={<ShopMenu />} />
         <Route path="/collections" element={<Collections setIsMobileFilterOpen={setIsMobileFilterOpen} />} />
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        
         <Route path="/auth-success" element={<AuthSuccess />} />
         <Route
           path="/profile"
@@ -102,7 +113,6 @@ const App = () => {
           <Route path="notifications" element={<Notifications />} />
         </Route>
 
-        {/* Admin Routes */}
         <Route
           path="/admin"
           element={
@@ -127,19 +137,13 @@ const App = () => {
           </Route>
         </Route>
 
-        {/* fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* Footer */}
       {!hideNavAndFooter && <Footer />}
 
-      {/* Bottom Navigation */}
       {!hideBottomNav && <BottomNav />}
-      <BottomNav hidden={isMobileFilterOpen || hideBottomNav} />
 
-
-      {/* Mobile Filter Drawer */}
       {isMobileFilterOpen && (
         <MobileFilter
           onClose={() => setIsMobileFilterOpen(false)}

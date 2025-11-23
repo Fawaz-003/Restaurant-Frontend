@@ -11,7 +11,13 @@ const Login = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const { axios, navigate, backendURL, setUser } = useAppContext();
 
-  // Check if user is already authenticated
+  const getToastPosition = () => {
+    if (window.innerWidth < 768) {
+      return "top-center";
+    }
+    return "top-right";
+  };
+
   useEffect(() => {
     const checkAuthStatus = () => {
       const token = localStorage.getItem("user-token");
@@ -20,7 +26,6 @@ const Login = () => {
       if (token && userStr) {
         try {
           const user = JSON.parse(userStr);
-          // If user is authenticated, redirect to appropriate page
           if (user && user.role === 1) {
             navigate("/admin/dashboard");
           } else if (user && user.role === 0) {
@@ -28,7 +33,6 @@ const Login = () => {
           }
         } catch (error) {
           console.error("Error parsing user data:", error);
-          // If there's an error parsing user data, continue to login page
         }
       }
       setCheckingAuth(false);
@@ -44,24 +48,20 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate form before showing loading
     if (!form.email || !form.password) {
       toast.error("Please enter both email and password", {
-        position: "top-right",
+        position: getToastPosition(),
       });
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
       toast.error("Please enter a valid email address", {
-        position: "top-right",
+        position: getToastPosition(),
       });
       return;
     }
-
-    // Now show loading after validation
     setIsLoading(true);
     
     try {
@@ -77,27 +77,25 @@ const Login = () => {
         try {
           await axios.post(`/api/profile/create/${userId}`);
         } catch (err) {
-          // Ignore if it already exists or fails silently
-          // console.warn("Profile create skipped:", err?.response?.data || err?.message);
+  
         }
       }
 
       toast.success(data.message, {
-        position: "top-right",
+        position: getToastPosition(),
         autoClose: 1500,
-        style: { margin: "45px" },
       });
       setForm({ email: "", password: "" });
 
       setTimeout(() => {
         if (data.user.role === 1) navigate("/admin/dashboard");
         else navigate("/profile");
-        setUser(data.user); // Update global user state
+        setUser(data.user);
       }, 1500);
     } catch (err) {
       toast.error(
         err.response?.data?.message || err.message || "Login failed",
-        { position: "top-right" }
+        { position: getToastPosition() }
       );
       setForm({ email: "", password: "" });
     } finally {
@@ -105,14 +103,13 @@ const Login = () => {
     }
   };
 
-  // Show loading while checking authentication
   if (checkingAuth) {
     return (
       <div className="min-h-screen bg-[#eff0f0] flex flex-col justify-center py-5 sm:px-5 lg:px-5">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white mx-3 py-8 px-4 shadow-sm rounded-lg sm:px-10 border border-gray-200">
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
               <span className="ml-3 text-gray-600">Checking authentication...</span>
             </div>
           </div>
@@ -124,11 +121,11 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-[#eff0f0] flex flex-col justify-center py-5 sm:px-5 lg:px-5">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white mx-3 py-8 px-4 shadow-sm rounded-lg sm:px-10 border border-gray-200">
+        <div className="bg-white mx-3 py-8 px-4  sm:px-10 ">
           <div className="sm:mx-auto mb-5 sm:w-full flex justify-center flex-col items-center m:max-w-md">
-            <h2 className="text-4xl text-gray-900 font-medium">Sign in</h2>
-            <p className="text-sm text-gray-500/90 mt-3">
-              Welcome back! Please sign in to continue
+            <h2 className="text-2xl md:text-3xl text-gray-900 font-medium">Login</h2>
+            <p className="text-center mt-2">
+              Welcome back! Please login to continue.
             </p>
           </div>
 
@@ -147,7 +144,7 @@ const Login = () => {
                   value={form.email}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                   placeholder="Enter your email"
                 />
               </div>
@@ -166,7 +163,7 @@ const Login = () => {
                   value={form.password}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition duration-200"
                   placeholder="Enter your password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -184,25 +181,10 @@ const Login = () => {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-700"
-                >
-                  Remember me
-                </label>
-              </div>
-
               <div className="text-sm">
                 <a
                   href="#"
-                  className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
+                  className="font-medium text-orange-600 hover:text-orange-500 transition duration-200"
                 >
                   Forgot your password?
                 </a>
@@ -213,7 +195,7 @@ const Login = () => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="w-full flex hover:cursor-pointer justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex hover:cursor-pointer justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
@@ -221,23 +203,10 @@ const Login = () => {
                     <span>Logging in...</span>
                   </div>
                 ) : (
-                  "Sign in"
+                  "Login"
                 )}
               </button>
               {isLoading && <Loading message="Logging in..." variant="green" />}
-            </div>
-
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
             </div>
 
             <div className="mt-3 grid grid-cols-1 gap-3">
@@ -253,7 +222,7 @@ const Login = () => {
                   src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleFavicon.png"
                   alt="googleFavicon"
                 />
-                Log in with Google
+                Login with Google
               </button>
             </div>
           </div>
@@ -263,9 +232,9 @@ const Login = () => {
                 Don't have an account?{" "}
                 <a
                   href="/register"
-                  className="font-medium text-blue-600 hover:text-blue-500 transition duration-200"
+                  className="font-medium text-orange-600 hover:text-orange-500 transition duration-200"
                 >
-                  Sign up for free
+                  Sign up
                 </a>
               </span>
             </div>
