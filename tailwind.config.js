@@ -1,15 +1,15 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
   theme: {
     extend: {
-      colors: {
-        brandBG: '#ffb703',
+      animation: {
+        'infinite-scroll-slow': 'infinite-scroll-slow 40s linear infinite',
       },
-    },
-  },
-  plugins: [],
-}; 
+      keyframes: {
+        'infinite-scroll-slow': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        }
+      }
+    }
+  }
+}

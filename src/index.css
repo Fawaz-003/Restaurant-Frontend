@@ -22,3 +22,23 @@ input[type="password"]::-webkit-inner-spin-button,
 input[type="password"]::-webkit-password-toggle-button {
   display: none;
 }
+
+@keyframes infinite-scroll-slow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll-slow {
+  animation: infinite-scroll-slow 25s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+/* Pause animation on hover */
+.animate-infinite-scroll-slow:hover {
+  animation-play-state: paused;
+}

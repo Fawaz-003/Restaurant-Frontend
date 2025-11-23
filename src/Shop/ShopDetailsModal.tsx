@@ -14,7 +14,6 @@ const ShopDetailsModal: React.FC<ShopDetailsModalProps> = ({ shop, onClose }) =>
     <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-[1px] flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl border border-gray-100 relative animate-in fade-in-90 zoom-in-95">
         
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute -top-3 -right-3 bg-white hover:bg-gray-100 border border-gray-200 rounded-full w-8 h-8 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 z-10"

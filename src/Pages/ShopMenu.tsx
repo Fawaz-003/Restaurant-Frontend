@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { MenuItem , CartItem } from '../utils/constant';
-import { menuItems , categories } from '../Menu/MenuItems';
+import { MenuItem, CartItem } from '../utils/constant';
+import { menuItems, categories } from '../Menu/MenuItems';
 import MenuHeader from '../Menu/MenuHeader';
 import MenuItemCard from '../Menu/MenuCard';
 import CartSidebar from '../Menu/CartSidebar';
@@ -12,6 +12,9 @@ const ShopMenu = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Filter best food items (you can define your own logic, e.g., rating > 4.5)
+  const bestFoodItems = menuItems.filter(item => item.rating > 4.5);
+  
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,40 +61,32 @@ const ShopMenu = () => {
         onSearchChange={setSearchQuery}
         onCategoryChange={setSelectedCategory}
         onShowCart={() => setShowCart(true)}
+        bestFoodItems={bestFoodItems} 
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-6 lg:flex lg:gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:py-2 lg:flex lg:gap-6">
         <div className="flex-1">
-          {/* <div className="hidden lg:block relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search for dishes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-          </div> */}
+          <div>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Our Menu</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  onAddToCart={addToCart}
+                />
+              ))}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <MenuItemCard
-                key={item.id}
-                item={item}
-                onAddToCart={addToCart}
-              />
-            ))}
-
-            {filteredItems.length === 0 && (
-              <div className="text-center py-12 col-span-full">
-                <p className="text-gray-500 text-lg">No items found matching your search.</p>
-              </div>
-            )}
+              {filteredItems.length === 0 && (
+                <div className="text-center py-12 col-span-full">
+                  <p className="text-gray-500 text-lg">No items found matching your search.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Desktop Cart Sidebar */}
-        <div className="hidden lg:block lg:w-96 lg:sticky lg:top-36 lg:self-start">
+        <div className="hidden lg:block lg:w-96 lg:sticky lg:top-54 lg:self-start">
           <CartSidebar
             cart={cart}
             onUpdateQuantity={updateQuantity}
@@ -101,7 +96,6 @@ const ShopMenu = () => {
         </div>
       </div>
 
-      {/* Mobile Cart Modal */}
       {showCart && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end lg:hidden">
           <CartSidebar
