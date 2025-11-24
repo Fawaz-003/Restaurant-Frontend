@@ -74,71 +74,73 @@ const App = () => {
   }, [isMobileFilterOpen]);
 
   return (
-    <div className="relative min-h-screen pb-16">
+    <div className="flex flex-col min-h-screen">
       {!hideNavAndFooter && <Navbar />}
       
       <ToastContainer limit={3} />
       
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="shop/:id" element={<ShopMenu />} />
-        <Route path="/collections" element={<Collections setIsMobileFilterOpen={setIsMobileFilterOpen} />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
-        <Route path="/auth-success" element={<AuthSuccess />} />
-        <Route
-          path="/profile"
-          element={
-            <UserRoute>
-              <UserProfile />
-            </UserRoute>
-          }
-        >
-          <Route index element={<Navigate to="personal-information" replace />} />
-          <Route path="personal-information" element={<PersonalInfo />} />
-          <Route path="wishlist" element={<Wishlist />} />
-          <Route path="my-orders" element={<Orders />} />
-          <Route path="addresses" element={<Addresses />} />
-          <Route path="returns-refunds" element={<Returns />} />
-          <Route path="payment-methods" element={<Payments />} />
-          <Route path="my-reviews" element={<Reviews />} />
-          <Route path="coupons" element={<Coupons />} />
-          <Route path="notifications" element={<Notifications />} />
-        </Route>
-
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminMenu />
-            </AdminRoute>
-          }
-        >
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="products">
-            <Route index element={<AdminProducts />} />
-            <Route path="add" element={<AddProducts />} />
-            <Route path="edit/:id" element={<EditProducts />} />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="shop/:id" element={<ShopMenu />} />
+          <Route path="/collections" element={<Collections setIsMobileFilterOpen={setIsMobileFilterOpen} />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          <Route path="/auth-success" element={<AuthSuccess />} />
+          <Route
+            path="/profile"
+            element={
+              <UserRoute>
+                <UserProfile />
+              </UserRoute>
+            }
+          >
+            <Route index element={<Navigate to="personal-information" replace />} />
+            <Route path="personal-information" element={<PersonalInfo />} />
+            <Route path="wishlist" element={<Wishlist />} />
+            <Route path="my-orders" element={<Orders />} />
+            <Route path="addresses" element={<Addresses />} />
+            <Route path="returns-refunds" element={<Returns />} />
+            <Route path="payment-methods" element={<Payments />} />
+            <Route path="my-reviews" element={<Reviews />} />
+            <Route path="coupons" element={<Coupons />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="settings" element={<AdminSettings />} />
-          <Route path="categories">
-            <Route index element={<AdminCategory />} />
-            <Route path="addcategory" element={<AddCategory />} />
-            <Route path="editcategory/:id" element={<EditCategory />} />
-          </Route>
-        </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminMenu />
+              </AdminRoute>
+            }
+          >
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="products">
+              <Route index element={<AdminProducts />} />
+              <Route path="add" element={<AddProducts />} />
+              <Route path="edit/:id" element={<EditProducts />} />
+            </Route>
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="categories">
+              <Route index element={<AdminCategory />} />
+              <Route path="addcategory" element={<AddCategory />} />
+              <Route path="editcategory/:id" element={<EditCategory />} />
+            </Route>
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
 
       {!hideNavAndFooter && <Footer />}
 

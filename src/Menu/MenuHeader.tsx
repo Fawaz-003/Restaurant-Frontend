@@ -23,7 +23,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
   const duplicatedBestFoodItems = [...bestFoodItems, ...bestFoodItems];
 
   return (
-    <div className="bg-white shadow-md sticky top-16 z-40">
+    <div className="bg-white shadow-md sticky top-20 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:py-2">
         <div className="lg:hidden flex items-center justify-between mb-4">
           <div className="flex-1">

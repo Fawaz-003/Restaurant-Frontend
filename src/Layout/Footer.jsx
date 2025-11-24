@@ -1,80 +1,117 @@
 import React from "react";
+import { FaLinkedin, FaInstagram, FaYoutube, FaFacebook, FaXTwitter, FaStar } from "react-icons/fa6";
+import { FiPhone } from "react-icons/fi";
+import { SiGoogleplay } from "react-icons/si";
 
 const Footer = () => {
   return (
-    <footer className="px-6 md:px-16 lg:px-24 xl:px-32 pt-8 w-full text-gray-500">
-      <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-500/30 pb-6">
-        <div className="md:max-w-96">
-          <svg
-            width="157"
-            height="40"
-            viewBox="0 0 157 40"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M47.904 28.28q-1.54 0-2.744-.644a5.1 5.1 0 0 1-1.904-1.82q-.672-1.148-.672-2.604v-3.864q0-1.456.7-2.604a4.9 4.9 0 0 1 1.904-1.792q1.204-.672 2.716-.672 1.82 0 3.276.952a6.44 6.44 0 0 1 2.324 2.52q.868 1.567.868 3.556 0 1.96-.868 3.556a6.5 6.5 0 0 1-2.324 2.492q-1.456.924-3.276.924m-7.196 5.32V14.56h3.08v3.612l-.532 3.276.532 3.248V33.6zm6.692-8.232q1.12 0 1.96-.504a3.6 3.6 0 0 0 1.344-1.456q.504-.924.504-2.128t-.504-2.128a3.43 3.43 0 0 0-1.344-1.428q-.84-.532-1.96-.532t-1.988.532a3.43 3.43 0 0 0-1.344 1.428q-.476.924-.476 2.128t.476 2.128a3.6 3.6 0 0 0 1.344 1.456q.868.504 1.988.504M56.95 28V14.56h3.08V28zm3.08-7.476-1.064-.532q0-2.548 1.12-4.116 1.148-1.596 3.444-1.596 1.008 0 1.82.364.812.365 1.512 1.176l-2.016 2.072a2.1 2.1 0 0 0-.812-.56 3 3 0 0 0-1.036-.168q-1.287 0-2.128.812-.84.811-.84 2.548m14.156 7.756q-2.016 0-3.64-.896a7 7 0 0 1-2.548-2.52q-.924-1.596-.924-3.584t.924-3.556a6.87 6.87 0 0 1 2.492-2.52q1.596-.924 3.528-.924 1.876 0 3.304.868a6.05 6.05 0 0 1 2.268 2.38q.84 1.512.84 3.444 0 .336-.056.7a7 7 0 0 1-.112.756H69.23v-2.52h9.436l-1.148 1.008q-.056-1.232-.476-2.072a3 3 0 0 0-1.204-1.288q-.756-.448-1.876-.448-1.176 0-2.044.504a3.43 3.43 0 0 0-1.344 1.428q-.476.896-.476 2.156t.504 2.212 1.428 1.484q.924.504 2.128.504 1.037 0 1.904-.364a4 4 0 0 0 1.512-1.064l1.96 1.988a6.3 6.3 0 0 1-2.38 1.736 7.6 7.6 0 0 1-2.968.588m15.91 0q-1.54 0-2.745-.644a5.1 5.1 0 0 1-1.904-1.82q-.672-1.148-.672-2.604v-3.864q0-1.456.7-2.604a4.9 4.9 0 0 1 1.904-1.792q1.204-.672 2.716-.672 1.821 0 3.276.952a6.44 6.44 0 0 1 2.324 2.52q.869 1.567.868 3.556 0 1.96-.868 3.556a6.5 6.5 0 0 1-2.324 2.492q-1.455.924-3.276.924M82.898 28V7.84h3.08v10.024l-.532 3.248.532 3.276V28zm6.692-2.632q1.12 0 1.96-.504a3.6 3.6 0 0 0 1.344-1.456q.504-.924.504-2.128t-.504-2.128a3.43 3.43 0 0 0-1.344-1.428q-.84-.532-1.96-.532t-1.988.532a3.43 3.43 0 0 0-1.344 1.428q-.476.924-.476 2.128.001 1.204.476 2.128a3.6 3.6 0 0 0 1.344 1.456q.87.504 1.988.504m15.067 2.912q-1.708 0-3.052-.756a5.5 5.5 0 0 1-2.072-2.072q-.728-1.344-.728-3.08V14.56h3.08v7.672q0 .98.308 1.68.336.672.952 1.036.644.364 1.512.364 1.344 0 2.044-.784.728-.812.728-2.296V14.56h3.08v7.812q0 1.764-.756 3.108a5.3 5.3 0 0 1-2.044 2.072q-1.317.728-3.052.728m8.976-.28V14.56h3.08V28zm1.54-15.904q-.783 0-1.316-.532-.504-.532-.504-1.316t.504-1.316a1.8 1.8 0 0 1 1.316-.532q.813 0 1.316.532t.504 1.316q0 .784-.504 1.316t-1.316.532M120.169 28V7.84h3.08V28zm8.552 0V8.96h3.08V28zm-3.22-10.64v-2.8h9.52v2.8zm17.274 10.92q-1.708 0-3.052-.756a5.5 5.5 0 0 1-2.072-2.072q-.728-1.344-.728-3.08V14.56h3.08v7.672q0 .98.308 1.68.336.672.952 1.036.643.364 1.512.364 1.344 0 2.044-.784.728-.812.728-2.296V14.56h3.08v7.812q0 1.764-.756 3.108a5.3 5.3 0 0 1-2.044 2.072q-1.317.728-3.052.728m8.977-.28V14.56h3.08V28zm1.54-15.904q-.785 0-1.316-.532-.504-.532-.504-1.316t.504-1.316a1.8 1.8 0 0 1 1.316-.532q.812 0 1.316.532t.504 1.316-.504 1.316-1.316.532"
-              fill="#000"
-            />
-            <path
-              d="m8.75 11.3 6.75 3.884 6.75-3.885M8.75 34.58v-7.755L2 22.939m27 0-6.75 3.885v7.754M2.405 15.408 15.5 22.954l13.095-7.546M15.5 38V22.939M29 28.915V16.962a2.98 2.98 0 0 0-1.5-2.585L17 8.4a3.01 3.01 0 0 0-3 0L3.5 14.377A3 3 0 0 0 2 16.962v11.953A2.98 2.98 0 0 0 3.5 31.5L14 37.477a3.01 3.01 0 0 0 3 0L27.5 31.5a3 3 0 0 0 1.5-2.585"
-              stroke="#4F39F6"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <p className="mt-6 text-sm">
-            Discover premium fashion and lifestyle products curated for the
-            modern individual. Quality, style, and innovation in every piece.
-          </p>
-        </div>
-        <div className="flex-1 flex items-start md:justify-end gap-20">
-          <div>
-            <h2 className="font-semibold mb-5 text-gray-800">Company</h2>
-            <ul className="text-sm space-y-2">
-              <li>
-                <a href="#">Home</a>
-              </li>
-              <li>
-                <a href="#">About us</a>
-              </li>
-              <li>
-                <a href="#">Contact us</a>
-              </li>
-              <li>
-                <a href="#">Privacy policy</a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h2 className="font-semibold text-gray-800 mb-5">
-              Subscribe to our newsletter
-            </h2>
-            <div className="text-sm space-y-2">
-              <p>
-                The latest news, articles, and resources, sent to your inbox
-                weekly.
-              </p>
-              <div className="flex items-center gap-2 pt-4">
-                <input
-                  className="border border-gray-500/30 placeholder-gray-500 focus:ring-2 ring-indigo-600 outline-none w-full max-w-64 h-9 rounded px-2"
-                  type="email"
-                  placeholder="Enter your email"
-                />
-                <button className="bg-blue-600 w-24 h-9 text-white rounded">
-                  Subscribe
-                </button>
-              </div>
+    <>
+      <div className="bg-orange-50 border-t border-gray-200 md:hidden">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="text-center">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Live It Up</h3>
+            <p className="text-gray-600 mb-4">
+              With My-Food, every meal is a celebration
+            </p>
+
+            <div className="flex justify-center space-x-4">
+              <button className="flex items-center space-x-2 bg-white border border-gray-300 rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <SiGoogleplay className="text-base" />
+                <span>Get the app</span>
+              </button>
+              <button className="flex items-center space-x-2 bg-white border border-gray-300 rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                 <FaStar className="text-yellow-500 text-base" />
+                <span>Rate us</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <p className="pt-4 text-center text-xs md:text-sm pb-5">
-        Copyright 2024 © <a href="https://prebuiltui.com">PrebuiltUI</a>. All
-        Right Reserved.
-      </p>
-    </footer>
+
+      <footer className="hidden md:block bg-gray-200 text-black px-6 py-10 md:px-20">
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 border-b border-gray-800 pb-8">
+
+          {/* Logo */}
+          <div>
+            <h1 className="text-4xl font-bold text-black cursor-pointer">My-Food</h1>
+          </div>
+
+          {/* For Restaurants */}
+          <div>
+            <h3 className="font-semibold text-black mb-3">For Restaurants</h3>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/partner" className="hover:text-black hover:underline transition">Partner With Us</a></li>
+              <li><a href="/restaurant-app" className="hover:text-black hover:underline transition">Apps For You</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-black mb-3">For Delivery Partners</h3>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/delivery" className="hover:text-black hover:underline transition">Partner With Us</a></li>
+              <li><a href="/delivery-app" className="hover:text-black hover:underline transition">Apps For You</a></li>
+            </ul>
+          </div>
+
+          {/* Learn More */}
+          <div>
+            <h3 className="font-semibold text-black mb-3">Learn More</h3>
+            <ul className="space-y-2 text-sm">
+              <li><a href="/privacy" className="hover:text-black hover:underline transition">Privacy</a></li>
+              <li><a href="/security" className="hover:text-black hover:underline transition">Security</a></li>
+              <li><a href="/terms" className="hover:text-black hover:underline transition">Terms of Service</a></li>
+              <li><a href="/support" className="hover:text-black hover:underline transition">Help & Support</a></li>
+              <li><a href="/fraud" className="hover:text-black hover:underline transition">Report a Fraud</a></li>
+              <li><a href="/blog" className="hover:text-black hover:underline transition">Blog</a></li>
+            </ul>
+          </div>
+
+          {/* Social & App Section */}
+          <div>
+            <h3 className="font-semibold text-black mb-3">Social Links</h3>
+
+            <div className="flex gap-3 text-xl mb-4">
+              {[
+                <FaLinkedin key="linkedin" />, 
+                <FaInstagram key="instagram" />, 
+                <FaYoutube key="youtube" />, 
+                <FaFacebook key="facebook" />, 
+                <FaXTwitter key="twitter" />
+              ].map((Icon, idx) => (
+                <a key={idx} href="#" className="hover:text-black hover:scale-110 transition-transform">
+                  {Icon}
+                </a>
+              ))}
+            </div>
+
+            {/* App Store Buttons */}
+            <a href="#" className="block w-40 mb-2">
+              <img
+                src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+                className="cursor-pointer"
+                alt="App Store"
+              />
+            </a>
+
+            <a href="#" className="block w-40">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                className="cursor-pointer"
+                alt="Play Store"
+              />
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom Text */}
+        <p className="text-xs text-center mt-6 text-gray-500">
+          By continuing past this page, you agree to our Terms of Service, Cookie Policy,
+          Privacy Policy and Content Policies. All trademarks are properties of their respective owners.
+          <br />© 2025 My-Food Pvt Ltd. All rights reserved.
+        </p>
+      </footer>
+    </>
   );
 };
 

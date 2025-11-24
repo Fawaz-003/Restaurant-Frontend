@@ -86,7 +86,7 @@ const ShopMenu = () => {
           </div>
         </div>
 
-        <div className="hidden lg:block lg:w-96 lg:sticky lg:top-56 lg:self-start">
+        <div className="hidden lg:block lg:w-96 lg:sticky lg:top-60 lg:self-start">
           <CartSidebar
             cart={cart}
             onUpdateQuantity={updateQuantity}
