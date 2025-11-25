@@ -45,6 +45,13 @@ import ProductDetail from "./Layout/ProductDetail";
 import AuthSuccess from "./Pages/Users/AuthSuccess";
 import Checkout from "./Pages/Checkout";
 import ShopMenu from "./Pages/ShopMenu";
+import PartnerWithUs from "./Components/Footer/PartnerWithUs";
+import AppForUs from "./Components/Footer/AppForUs";
+import Privacy from "./Components/Footer/Privacy"
+import Security from "./Components/Footer/Security";
+import TermsandConditions from "./Components/Footer/TermsandConditions";
+import HelpCenter from "./Components/Footer/HelpCenter";
+import FraudAndSuppport from "./Components/Footer/FraudAndSuppport";
 
 const App = () => {
   const location = useLocation();
@@ -89,10 +96,15 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          
+          <Route path="/partnerwithus" element={<PartnerWithUs />} />
+          <Route path="/appforus" element={<AppForUs />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/privacy-policy" element={<Privacy />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
+          <Route path="/terms&conditions" element={<TermsandConditions />} />
+          <Route path="/Helpcenter" element={<HelpCenter />} />
+          <Route path="/reportfraud" element={<FraudAndSuppport />} />
           <Route path="/auth-success" element={<AuthSuccess />} />
           <Route
             path="/profile"
