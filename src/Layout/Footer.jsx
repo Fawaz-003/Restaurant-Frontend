@@ -1,114 +1,113 @@
 import React from "react";
-import { FaLinkedin, FaInstagram, FaYoutube, FaFacebook, FaXTwitter, FaStar } from "react-icons/fa6";
-import { FiPhone } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import {
+  FaLinkedin,
+  FaInstagram,
+  FaYoutube,
+  FaFacebook,
+  FaXTwitter,
+  FaStar,
+} from "react-icons/fa6";
 import { SiGoogleplay } from "react-icons/si";
 
 const Footer = () => {
   return (
     <>
+      {/* Mobile Footer */}
       <div className="bg-orange-50 border-t border-gray-200 md:hidden">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Live It Up</h3>
-            <p className="text-gray-600 mb-4">
-              With My-Food, every meal is a celebration
-            </p>
+        <div className="max-w-7xl mx-auto px-4 py-6 text-center">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">My-Food 🍽️</h3>
+          <p className="text-gray-700 text-sm mb-4">
+            With My-Food, every meal is a celebration!
+          </p>
 
-            <div className="flex justify-center space-x-4">
-              <button className="flex items-center space-x-2 bg-white border border-gray-300 rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          <div className="flex justify-center space-x-3">
+            <button className="flex items-center space-x-2 bg-white shadow-sm rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-orange-100 transition">
               <SiGoogleplay className="text-base" />
-                <span>Get the app</span>
-              </button>
-              <button className="flex items-center space-x-2 bg-white border border-gray-300 rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                 <FaStar className="text-yellow-500 text-base" />
-                <span>Rate us</span>
-              </button>
-            </div>
+              <span>Get App</span>
+            </button>
+
+            <button className="flex items-center space-x-2 bg-white shadow-sm rounded-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-orange-100 transition">
+              <FaStar className="text-yellow-500 text-base" />
+              <span>Rate Us</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <footer className="hidden md:block bg-gray-200 text-black px-6 py-10 md:px-20">
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 border-b border-gray-800 pb-8">
+      {/* Desktop Footer */}
+      <footer className="hidden md:block bg-gradient-to-br from-orange-50 via-white to-orange-50 text-black px-6 py-12 md:px-20 shadow-inner">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 pb-8">
 
           {/* Logo */}
           <div>
-            <h1 className="text-4xl font-bold text-black cursor-pointer">My-Food</h1>
+            <h1 className="text-4xl font-extrabold text-orange-600 cursor-pointer">
+              My-Food
+            </h1>
+            <p className="text-sm text-gray-600 mt-2">
+              Finest meals at your fingertips.
+            </p>
           </div>
 
           {/* For Restaurants */}
           <div>
-            <h3 className="font-semibold text-black mb-3">For Restaurants</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/partner" className="hover:text-black hover:underline transition">Partner With Us</a></li>
-              <li><a href="/restaurant-app" className="hover:text-black hover:underline transition">Apps For You</a></li>
+            <h3 className="font-semibold text-gray-900 mb-3">For Restaurants</h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li><Link to="/partnerwithus" className="hover:text-orange-600 transition">Partner With Us</Link></li>
+              <li><Link to="/appforus" className="hover:text-orange-600 transition">Apps For You</Link></li>
             </ul>
           </div>
 
+          {/* For Delivery Partners */}
           <div>
-            <h3 className="font-semibold text-black mb-3">For Delivery Partners</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/delivery" className="hover:text-black hover:underline transition">Partner With Us</a></li>
-              <li><a href="/delivery-app" className="hover:text-black hover:underline transition">Apps For You</a></li>
+            <h3 className="font-semibold text-gray-900 mb-3">For Delivery Partners</h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li><Link to="/delivery" className="hover:text-orange-600 transition">Partner With Us</Link></li>
+              <li><Link to="/delivery-app" className="hover:text-orange-600 transition">Apps For You</Link></li>
             </ul>
           </div>
 
           {/* Learn More */}
           <div>
-            <h3 className="font-semibold text-black mb-3">Learn More</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/privacy" className="hover:text-black hover:underline transition">Privacy</a></li>
-              <li><a href="/security" className="hover:text-black hover:underline transition">Security</a></li>
-              <li><a href="/terms" className="hover:text-black hover:underline transition">Terms of Service</a></li>
-              <li><a href="/support" className="hover:text-black hover:underline transition">Help & Support</a></li>
-              <li><a href="/fraud" className="hover:text-black hover:underline transition">Report a Fraud</a></li>
-              <li><a href="/blog" className="hover:text-black hover:underline transition">Blog</a></li>
+            <h3 className="font-semibold text-gray-900 mb-3">Learn More</h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li><Link to="/privacy-Policy" className="hover:text-orange-600 transition">Privacy Policy</Link></li>
+              {/* <li><Link to="/security" className="hover:text-orange-600 transition">Security</Link></li> */}
+              <li><Link to="/terms&conditions" className="hover:text-orange-600 transition">Terms & Conditions</Link></li>
+              <li><Link to="/helpcenter" className="hover:text-orange-600 transition">Help & Support</Link></li>
+              <li><Link to="/reportfraud" className="hover:text-orange-600 transition">Report a Fraud</Link></li>
             </ul>
           </div>
 
-          {/* Social & App Section */}
+          {/* Socials + App Stores */}
           <div>
-            <h3 className="font-semibold text-black mb-3">Social Links</h3>
-
-            <div className="flex gap-3 text-xl mb-4">
-              {[
-                <FaLinkedin key="linkedin" />, 
-                <FaInstagram key="instagram" />, 
-                <FaYoutube key="youtube" />, 
-                <FaFacebook key="facebook" />, 
-                <FaXTwitter key="twitter" />
-              ].map((Icon, idx) => (
-                <a key={idx} href="#" className="hover:text-black hover:scale-110 transition-transform">
-                  {Icon}
-                </a>
+            <h3 className="font-semibold text-gray-900 mb-3">Follow Us</h3>
+            <div className="flex gap-3 text-xl text-gray-700 mb-4">
+              {[<FaLinkedin />, <FaInstagram />, <FaYoutube />, <FaFacebook />, <FaXTwitter />].map((icon, idx) => (
+                <span key={idx} className="hover:text-orange-600 hover:scale-110 transition cursor-pointer">
+                  {icon}
+                </span>
               ))}
             </div>
 
-            {/* App Store Buttons */}
-            <a href="#" className="block w-40 mb-2">
-              <img
-                src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-                className="cursor-pointer"
-                alt="App Store"
-              />
-            </a>
+            <img
+              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+              className="cursor-pointer w-40 mb-3"
+              alt="App Store"
+            />
 
-            <a href="#" className="block w-40">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-                className="cursor-pointer"
-                alt="Play Store"
-              />
-            </a>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+              className="cursor-pointer w-40"
+              alt="Play Store"
+            />
           </div>
         </div>
 
-        {/* Bottom Text */}
-        <p className="text-xs text-center mt-6 text-gray-500">
-          By continuing past this page, you agree to our Terms of Service, Cookie Policy,
-          Privacy Policy and Content Policies. All trademarks are properties of their respective owners.
-          <br />© 2025 My-Food Pvt Ltd. All rights reserved.
+        {/* Footer Bottom Text */}
+        <p className="text-xs text-center mt-6 text-gray-600">
+          © 2025 My-Food Pvt Ltd. All Rights Reserved. | By continuing, you agree to our
+          <span className="text-orange-600 cursor-pointer hover:underline"> Terms, Privacy & Cookies.</span>
         </p>
       </footer>
     </>
