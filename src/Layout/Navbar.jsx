@@ -1,257 +1,230 @@
-import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Heart, MapPin, Package, Navigation } from "lucide-react";
-import { getCart, getCartItemCount } from "../utils/cartUtils";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../Context/AppContext";
+import {
+  MapPin,
+  Search,
+  ShoppingCart,
+  Smartphone,
+} from "lucide-react";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [profilePath, setProfilePath] = useState("/login");
-  const [items, setItems] = useState(0);
-  const [currentLocation, setCurrentLocation] = useState("Select location");
-  const [isLocationLoading, setIsLocationLoading] = useState(false);
-  const { axios, user } = useAppContext();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, token, userData } = useAppContext();
+  const authenticated = isAuthenticated();
+  const avatarLetter =
+    userData?.name?.trim()?.charAt(0)?.toUpperCase() || "P";
+  const [locationValue, setLocationValue] = useState("");
+  const [isLocating, setIsLocating] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  useEffect(() => {
+    if (token && location.pathname === "/login") {
+      navigate("/profile", { replace: true });
+    }
+  }, [token, location.pathname, navigate]);
+
+  const handleProfileClick = () => {
+    navigate(authenticated ? "/profile" : "/login");
   };
 
-  // Function to request location permission
-  const requestLocation = () => {
+  const handleViewDashboardClick = () => {
+    if (userData?.role?.toLowerCase() === "admin") {
+      navigate("/admin-dashboard");
+    } else if (userData?.role?.toLowerCase() === "seller") {
+      navigate("/seller-dashboard");
+    }
+  };
+
+  const handleDetectLocation = () => {
+    if (isLocating) return;
+
     if (!navigator.geolocation) {
-      setCurrentLocation("Geolocation not supported");
+      setLocationValue("Location not supported");
       return;
     }
 
-    setIsLocationLoading(true);
-
+    setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      async ({ coords }) => {
         try {
-          const { latitude, longitude } = position.coords;
-          // Using OpenStreetMap Nominatim API for reverse geocoding
+          const { latitude, longitude } = coords;
+          const params = new URLSearchParams({
+            format: "jsonv2",
+            lat: latitude.toString(),
+            lon: longitude.toString(),
+          });
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            `https://nominatim.openstreetmap.org/reverse?${params.toString()}`
           );
           const data = await response.json();
+          const address = data?.address || {};
+          const streetLine = [
+            [address.house_number, address.road || address.street || address.residential]
+              .filter(Boolean)
+              .join(" "),
+          ];
+          const localityLine = [
+            address.neighbourhood ||
+              address.suburb ||
+              address.village ||
+              address.hamlet,
+          ];
+          const cityLine = [
+            address.city ||
+              address.town ||
+              address.municipality ||
+              address.county ||
+              address.city_district,
+          ];
+          const regionLine = [address.state, address.postcode].filter(Boolean).join(" ");
 
-          if (data.address) {
-            const { city, town, village, county, state, suburb } = data.address;
-            const locationName = city || town || village || suburb || county || state || "Unknown location";
-            setCurrentLocation(locationName);
-          } else {
-            setCurrentLocation("Location not found");
-          }
+          const locationText = [
+            streetLine.filter(Boolean).join(" "),
+            localityLine.filter(Boolean).join(" "),
+            cityLine.filter(Boolean).join(" "),
+            regionLine,
+          ]
+            .filter(Boolean)
+            .join(", ");
+
+          setLocationValue(locationText || "Location detected");
         } catch (error) {
-          console.error("Error fetching location:", error);
-          setCurrentLocation("Location error");
+          setLocationValue("Unable to fetch address");
         } finally {
-          setIsLocationLoading(false);
+          setIsLocating(false);
         }
       },
       (error) => {
-        console.error("Geolocation error:", error);
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            setCurrentLocation("Location denied");
-            break;
-          case error.POSITION_UNAVAILABLE:
-            setCurrentLocation("Location unavailable");
-            break;
-          case error.TIMEOUT:
-            setCurrentLocation("Location timeout");
-            break;
-          default:
-            setCurrentLocation("Location error");
+        if (error.code === error.PERMISSION_DENIED) {
+          setLocationValue("Location permission denied");
+        } else {
+          setLocationValue("Unable to access location");
         }
-        setIsLocationLoading(false);
+        setIsLocating(false);
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
-      }
+      { enableHighAccuracy: true }
     );
   };
 
-  // Try to get location on component mount
-  useEffect(() => {
-    requestLocation();
-  }, []);
-
-  // update profilePath whenever token/user changes
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("user-token");
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      if (token && user) {
-        if (user.role === 0) {
-          setProfilePath("/profile");
-        } else if (user.role === 1) {
-          setProfilePath("/admin/dashboard");
-        } else {
-          setProfilePath("/login");
-        }
-      } else {
-        setProfilePath("/login");
-      }
-    };
-    checkAuth();
-
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
-
-  // Update cart count on mount and when cart changes
-  useEffect(() => {
-    const updateCartCount = async () => {
-      const cart = await getCart(axios);
-      setItems(getCartItemCount(cart));
-    };
-
-    updateCartCount();
-
-    window.addEventListener('cartUpdated', updateCartCount);
-    return () => window.removeEventListener('cartUpdated', updateCartCount);
-  }, [user, axios]);
-
-  const navLinkClass = ({ isActive }) =>
-    isActive
-      ? "text-red-600 font-semibold px-3 py-2 text-sm transition-colors duration-200 flex items-center space-x-2"
-      : "text-gray-900 hover:text-red-600 px-3 py-2 text-sm font-medium transition-colors duration-200 flex items-center space-x-2";
-
-  const mobileNavLinkClass = ({ isActive }) =>
-    isActive
-      ? "text-red-600 font-semibold block px-3 py-2 text-base transition-colors duration-200 flex items-center space-x-3"
-      : "text-gray-900 hover:text-gray-600 block px-3 py-2 text-base font-medium transition-colors duration-200 flex items-center space-x-3";
-
   return (
-    <nav className="bg-white sticky top-0 z-50 p-2">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-6">
-            <div className="flex-shrink-0">
-              <span className="text-xl font-bold text-gray-900">My-Food</span>
-            </div>
-
-            <div className="hidden md:block">
-              <button
-                onClick={requestLocation}
-                disabled={isLocationLoading}
-                className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-gray-300 hover:border-gray-400 transition-colors duration-200 disabled:opacity-50 w-64"
-              >
-                <MapPin size={16} className="text-red-500 flex-shrink-0" />
-                <span className="text-sm text-gray-700 flex-1 text-left truncate">
-                  {isLocationLoading ? "Getting location..." : currentLocation}
-                </span>
-                <Navigation size={14} className="text-gray-500 flex-shrink-0" />
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <div className="hidden md:flex items-center space-x-4">
-              <NavLink to="/profile/my-orders" className={navLinkClass}>
-                <Package size={18} />
-                <span>My Orders</span>
-              </NavLink>
-              <NavLink to="/profile/wishlist" className={navLinkClass}>
-                <Heart size={18} />
-                <span>Wishlist</span>
-              </NavLink>
-              <NavLink to={profilePath} className={navLinkClass}>
-                <User size={18} />
-                <span>Profile</span>
-              </NavLink>
-            </div>
-
-            <div className="md:hidden">
-              <button
-                onClick={toggleMenu}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
-              >
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className={`fixed inset-0 z-50 flex md:hidden ${isMenuOpen ? "" : "pointer-events-none"
-          }`}
-      >
-        {/* Overlay */}
-        <div
-          className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ${isMenuOpen ? "opacity-100" : "opacity-0"
-            }`}
-          onClick={toggleMenu}
-        ></div>
-
-        <div
-          className={`fixed top-0 right-0 w-64 h-full bg-white shadow-xl transform transition-transform duration-300 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
-            }`}
+    <div className="border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-20">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-lg font-semibold text-slate-900"
         >
-          <div className="flex flex-col h-full">
-            <div className="px-4 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-gray-900">My-Food</span>
-                <button
-                  onClick={toggleMenu}
-                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
+          <span className="rounded-full bg-amber-500 px-3 py-1 text-sm uppercase tracking-widest text-white">
+            Resto
+          </span>
+          <span className="text-slate-900">Marketplace</span>
+        </Link>
 
-            <div className="px-4 py-3 border-b border-gray-200">
-              <button
-                onClick={requestLocation}
-                disabled={isLocationLoading}
-                className="flex items-center space-x-2 w-full px-3 py-2 rounded-lg border border-gray-300 hover:border-gray-400 transition-colors duration-200 disabled:opacity-50"
+        <div className="flex flex-none items-center gap-3">
+          <button className="hidden h-9 items-center gap-2 rounded-full border border-amber-200 bg-white px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 sm:inline-flex">
+            <Smartphone className="h-4 w-4" aria-hidden="true" />
+            <span>Get the app</span>
+          </button>
+          <button className="inline-flex h-9 items-center gap-2 rounded-full bg-amber-500 px-4 text-sm font-semibold text-white transition hover:bg-amber-600">
+            <ShoppingCart className="h-4 w-4" aria-hidden="true" />
+            <span>Cart</span>
+          </button>
+          {authenticated && (userData?.role?.toLowerCase() === "admin" || userData?.role?.toLowerCase() === "seller") && (
+            <button
+              onClick={handleViewDashboardClick}
+              className="hidden h-9 items-center rounded-full border border-blue-300 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 sm:inline-flex"
+            >
+              View Dashboard
+            </button>
+          )}
+          {!authenticated ? (
+            <>
+              <Link
+                to="/login"
+                className="hidden h-11 items-center rounded-full px-4 text-sm font-semibold text-slate-600 transition hover:text-amber-600 sm:flex"
               >
-                <MapPin size={16} className="text-red-500 flex-shrink-0" />
-                <span className="text-sm text-gray-700 flex-1 text-left truncate">
-                  {isLocationLoading ? "Getting location..." : currentLocation}
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="hidden h-11 items-center rounded-full border border-amber-300 px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 sm:flex"
+              >
+                Register
+              </Link>
+            </>
+          ) : (
+            <button
+              onClick={handleProfileClick}
+              className="flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:border-amber-500 hover:text-amber-600"
+            >
+              {userData?.avatar ? (
+                <img
+                  src={userData.avatar}
+                  alt={userData.name || "Profile"}
+                  className="h-6 w-6 rounded-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-xs font-bold text-white">
+                  {avatarLetter}
                 </span>
-                <Navigation size={14} className="text-gray-500 flex-shrink-0" />
-              </button>
-            </div>
+              )}
+              <span>Profile</span>
+            </button>
+          )}
+        </div>
+      </header>
 
-            <div className="flex-1 overflow-y-auto">
-              <nav className="p-4 space-y-1">
-                <NavLink
-                  to="/profile/my-orders"
-                  onClick={toggleMenu}
-                  className={mobileNavLinkClass}
-                >
-                  <Package size={18} />
-                  <span>My Orders</span>
-                </NavLink>
-                <NavLink
-                  to="/profile/wishlist"
-                  onClick={toggleMenu}
-                  className={mobileNavLinkClass}
-                >
-                  <Heart size={18} />
-                  <span>Wishlist</span>
-                </NavLink>
-                <NavLink
-                  to={profilePath}
-                  onClick={toggleMenu}
-                  className={mobileNavLinkClass}
-                >
-                  <User size={18} />
-                  <span>Profile</span>
-                </NavLink>
-              </nav>
-            </div>
+      <div>
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:gap-4">
+          <form
+            className="flex w-full flex-1 items-center gap-3 rounded-2xl border border-white/70 bg-gray-50 px-5 py-2 shadow-md shadow-white/40 backdrop-blur-xl"
+            onSubmit={(e) => e.preventDefault()}
+            style={{ flexBasis: "60%" }}
+          >
+            <Search className="h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input
+              type="text"
+              placeholder="Search dishes, chefs, cuisines..."
+              className="w-full rounded-xl border border-white/80 bg-white/10 px-3 py-2 text-sm text-slate-800 placeholder-slate-500 outline-none backdrop-blur ring-1 ring-white/30 transition focus:border-amber-400 focus:bg-white/60 focus:ring-amber-200/60"
+            />
+            <button
+              type="submit"
+              className="rounded-full bg-amber-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-amber-600"
+            >
+              Search
+            </button>
+          </form>
+          <div
+            className="flex w-full flex-1 items-center gap-3 rounded-2xl border border-white/70 bg-gray-50 px-4 py-2 text-sm text-slate-700 shadow-md shadow-white/40 backdrop-blur-xl"
+            style={{ flexBasis: "40%" }}
+          >
+            <MapPin className="h-6 w-6 text-amber-600" aria-hidden="true" />
+            <input
+              type="text"
+              readOnly
+              value={locationValue}
+              placeholder={
+                isLocating ? "Detecting your location..." : "Use my current location"
+              }
+              className="w-full cursor-pointer rounded-xl border border-white/80 bg-white/40 px-3 py-2 text-sm text-slate-800 placeholder-slate-500 outline-none backdrop-blur ring-1 ring-white/30 transition focus:border-amber-400 focus:bg-white/60 focus:ring-amber-200/60"
+              onClick={handleDetectLocation}
+              onFocus={handleDetectLocation}
+            />
+            <button
+              type="button"
+              className="rounded-full bg-slate-900/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-slate-900"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDetectLocation();
+              }}
+            >
+              {isLocating ? "Locating..." : "Detect"}
+            </button>
           </div>
         </div>
       </div>
-    </nav>
+    </div>
   );
 };
 

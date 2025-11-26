@@ -1,17 +1,14 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App from "./App.jsx";
-import ScrollToTop from "./Components/ScrollToTop.jsx";
-import { AppContextProvider } from "./Context/AppContext.jsx";
-import "react-toastify/dist/ReactToastify.css";
+import App from "./App";
 import "./index.css";
 
-createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
     <BrowserRouter>
-      <ScrollToTop />
-      <AppContextProvider>
-        <App />
-      </AppContextProvider>
+      <App />
     </BrowserRouter>
+  </React.StrictMode>
 );
+
