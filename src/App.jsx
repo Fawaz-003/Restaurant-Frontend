@@ -24,7 +24,7 @@ const App = () => {
     <AppProvider>
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Navbar />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-12 pt-6">
+        <main className="mx-auto w-full max-w-7xl flex-1 pb-12">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

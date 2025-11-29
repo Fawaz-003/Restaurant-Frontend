@@ -50,7 +50,7 @@ const ShopMenu = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-slate-50">
+    <div className="min-h-screen ">
       <MenuHeader
         searchQuery={searchQuery}
         selectedCategory={selectedCategory}
