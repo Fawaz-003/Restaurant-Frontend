@@ -10,7 +10,7 @@ const DashboardHome = () => {
   ];
 
   return (
-    <div className="-m-6"> {/* Use negative margin to counteract parent padding if needed, or just an empty div */}
+    <div className="p-6">
       <h2 className="text-2xl font-semibold text-slate-900">Dashboard Overview</h2>
       <p className="mt-1 text-sm text-slate-500">
         Welcome to the central hub for managing the Resto Marketplace platform.

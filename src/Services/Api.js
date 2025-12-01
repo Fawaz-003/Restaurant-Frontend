@@ -137,7 +137,7 @@ export const createApiFunctions = (baseURL, token) => {
   
   // Get all shops
   const getAllShops = async () => {
-    return apiCall(baseURL, null, "/api/shops/", {
+    return apiCall(baseURL, null, "/api/shops", {
       method: "GET",
     });
   };
@@ -173,7 +173,11 @@ export const createApiFunctions = (baseURL, token) => {
       formData.append("image", imageFile);
     }
     Object.keys(shopData).forEach((key) => {
-      formData.append(key, shopData[key]);
+      if (typeof shopData[key] === 'object' && shopData[key] !== null) {
+        formData.append(key, JSON.stringify(shopData[key]));
+      } else {
+        formData.append(key, shopData[key]);
+      }
     });
     return apiCallFormData(baseURL, token, `/api/shops/update/${id}`, formData, "PUT");
   };
@@ -285,6 +289,7 @@ export const createApiFunctions = (baseURL, token) => {
     
     // Shop APIs
     getAllShops,
+    listShops: getAllShops, // Alias getAllShops to listShops
     getMyShops,
     getShopById,
     addShop,
@@ -370,7 +375,7 @@ export const api = {
 
   // Shop APIs
   getAllShops: (baseURL) => 
-    apiCall(baseURL, null, "/api/shops/", {
+    apiCall(baseURL, null, "/api/shops", {
       method: "GET",
     }),
   

@@ -18,11 +18,11 @@ const AdminDashboard = () => {
   const ActiveComponent = menuItems.find(item => item.id === activeView)?.component || DashboardHome;
 
   return (
-    <div className="py-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl py-12">
+        <div className="flex gap-8">
           {/* Sidebar */}
-          <aside className="md:col-span-3 lg:col-span-2">
+          <aside className="w-64 flex-shrink-0">
             <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <h3 className="px-3 text-xs font-semibold uppercase text-slate-500">
                 Admin Menu
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
           </aside>
 
           {/* Main Content */}
-          <main className="md:col-span-9 lg:col-span-10">
+          <main className="flex-1">
             <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
               <ActiveComponent />
             </div>
