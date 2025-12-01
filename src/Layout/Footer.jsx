@@ -16,7 +16,7 @@ const Footer = () => {
       {/* Mobile Footer */}
       <div className="bg-orange-50 border-t border-gray-200 md:hidden">
         <div className="max-w-7xl mx-auto px-4 py-6 text-center">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">My-Food 🍽️</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">My-Food </h3>
           <p className="text-gray-700 text-sm mb-4">
             With My-Food, every meal is a celebration!
           </p>

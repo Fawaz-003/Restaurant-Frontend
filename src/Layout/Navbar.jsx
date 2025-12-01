@@ -137,7 +137,7 @@ const Navbar = () => {
       : "text-gray-900 hover:text-gray-600 block px-3 py-2 text-base font-medium transition-colors duration-200 flex items-center space-x-3";
 
   return (
-    <nav className="bg-white sticky top-0 z-50 p-2 border-b border-slate-200">
+    <nav className="bg-white sticky top-0 z-50 p-2  border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left section - Logo and location */}

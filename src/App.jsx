@@ -24,7 +24,6 @@ const App = () => {
     <AppProvider>
       <div className="flex min-h-screen flex-col bg-slate-50">
         <Navbar />
-        <main className="mx-auto w-full max-w-7xl flex-1 pb-12">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -44,7 +43,6 @@ const App = () => {
             <Route path="/reportfraud" element={<FraudAndSupport />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </main>
         <Footer />
       </div>
     </AppProvider>

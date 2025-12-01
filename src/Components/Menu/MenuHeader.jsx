@@ -14,20 +14,20 @@ const MenuHeader = ({
   const duplicatedBestFoodItems = [...bestFoodItems, ...bestFoodItems];
 
   return (
-    <div className="bg-white shadow-md sticky top-15 sm:top-20 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:py-2">
+    <div className="bg-white  sticky top-20 sm:top-20 z-40">
+      <div className="max-w-7xl mx-auto sm:py-2">
         <div className="lg:hidden flex items-center justify-between mb-4">
           <div className="flex-1">
             <h2 className="text-sm sm:text-lg font-bold text-gray-800">Highly Recommended</h2>
           </div>
           <button
             onClick={onShowCart}
-            className="relative bg-orange-500 text-white py-1 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
+            className="relative bg-orange-500 text-white py-1 px-3 rounded-xl text-sm sn:text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Cart</span>
             {totalItems > 0 && (
-              <span className="absolute top-1 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              <span className="absolute top-1 -right-1 bg-orange-600 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                 {totalItems}
               </span>
             )}

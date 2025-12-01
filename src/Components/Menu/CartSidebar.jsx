@@ -16,8 +16,8 @@ const CartSidebar = ({
       {/* Header - Fixed height */}
       <div className="bg-orange-500 text-white p-4 flex items-center justify-between flex-shrink-0">
         <div>
-          <h2 className="text-xl font-bold">Your Cart</h2>
-          <p className="text-sm opacity-90">{getTotalItems()} items</p>
+          <h2 className="text-sm sm:text-[16px] font-bold">Your Cart</h2>
+          <p className="text-[12px] font-semibold opacity-90">{getTotalItems()} items</p>
         </div>
         {isMobile && onClose && (
           <button
@@ -61,7 +61,8 @@ const CartSidebar = ({
               ₹{getTotalPrice() + Math.round(getTotalPrice() * 0.05)}
             </span>
           </div>
-          <Link
+        <div className='text-center'>
+            <Link
             to="/checkout"
             state={{
               totalItems: getTotalItems(),
@@ -69,10 +70,11 @@ const CartSidebar = ({
               finalAmount: getTotalPrice() + Math.round(getTotalPrice() * 0.05),
               cart,
             }}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-2 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg  text-sm sm:text-[16px] shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Proceed to Checkout
           </Link>
+        </div>
 
         </div>
       )}

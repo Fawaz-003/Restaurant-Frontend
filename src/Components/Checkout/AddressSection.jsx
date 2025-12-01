@@ -23,7 +23,7 @@ const AddressSection = ({
         id: Date.now(),
         label: newAddress.label,
         address: fullAddress,
-        deliveryTime: '40 mins'
+        // deliveryTime: '40 mins'
       });
       setNewAddress({ label: 'Home', street: '', city: '', state: '', pincode: '' });
       setShowAddressForm(false);
