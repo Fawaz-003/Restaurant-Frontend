@@ -118,13 +118,6 @@ export const createApiFunctions = (baseURL, token) => {
     });
   };
 
-  // Delete user (Admin only)
-  const deleteUser = async (id) => {
-    return apiCall(baseURL, token, `/api/users/delete/${id}`, {
-      method: "DELETE",
-    });
-  };
-
   // Update user (Admin only)
   const updateUser = async (id, userData) => {
     return apiCall(baseURL, token, `/api/users/update/${id}`, {
@@ -292,7 +285,6 @@ export const createApiFunctions = (baseURL, token) => {
     googleAuth,
     adminCreateUser,
     getAllUsers,
-    deleteUser,
     updateUser,
     
     // Shop APIs
@@ -367,11 +359,6 @@ export const api = {
   getAllUsers: (baseURL, token) =>
     apiCall(baseURL, token, "/api/users/all", {
       method: "GET",
-    }),
-
-  deleteUser: (baseURL, token, id) =>
-    apiCall(baseURL, token, `/api/users/delete/${id}`, {
-      method: "DELETE",
     }),
 
   updateUser: (baseURL, token, id, userData) =>

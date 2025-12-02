@@ -33,7 +33,7 @@ const Navbar = () => {
   useEffect(() => {
     if (authenticated && userData) {
       if (userData.role?.toLowerCase() === "admin") {
-        setProfilePath("/admin-dashboard");
+        setProfilePath("/admin");
       } else if (userData.role?.toLowerCase() === "seller") {
         setProfilePath("/seller-dashboard");
       } else {
@@ -58,7 +58,7 @@ const Navbar = () => {
 
   const handleViewDashboardClick = () => {
     if (userData?.role?.toLowerCase() === "admin") {
-      navigate("/admin-dashboard");
+      navigate("/admin");
     } else if (userData?.role?.toLowerCase() === "seller") {
       navigate("/seller-dashboard");
     }
@@ -305,7 +305,7 @@ const Navbar = () => {
                       handleViewDashboardClick();
                       toggleMenu();
                     }}
-                    className="w-full text-left text-gray-900 hover:text-gray-600 block px-3 py-2 text-base font-medium transition-colors duration-200 flex items-center space-x-3"
+                    className="w-full text-gray-900 hover:text-gray-600 px-3 py-2 text-base font-medium transition-colors duration-200 flex items-center space-x-3"
                   >
                     <span>View Dashboard</span>
                   </button>
@@ -316,7 +316,7 @@ const Navbar = () => {
                     handleProfileClick();
                     toggleMenu();
                   }}
-                  className="w-full text-left text-gray-900 hover:text-gray-600 block px-3 py-2 text-base font-medium transition-colors duration-200 flex items-center space-x-3"
+                  className="w-full text-gray-900 hover:text-gray-600 px-3 py-2 text-base font-medium transition-colors duration-200 flex items-center space-x-3"
                 >
                   <User size={18} />
                   <span>{authenticated ? (userData?.name || "Profile") : "Login"}</span>
