@@ -159,9 +159,17 @@ export const createApiFunctions = (baseURL, token) => {
   // Add a new shop (Admin only)
   const addShop = async (shopData, imageFile) => {
     const formData = new FormData();
-    formData.append("image", imageFile);
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
     Object.keys(shopData).forEach((key) => {
-      formData.append(key, shopData[key]);
+      if (typeof shopData[key] === 'object' && shopData[key] !== null) {
+        Object.keys(shopData[key]).forEach(subKey => {
+          formData.append(`${key}[${subKey}]`, shopData[key][subKey]);
+        });
+      } else {
+        formData.append(key, shopData[key]);
+      }
     });
     return apiCallFormData(baseURL, token, "/api/shops/add", formData, "POST");
   };

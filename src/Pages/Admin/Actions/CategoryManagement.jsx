@@ -42,12 +42,21 @@ const CategoryManagement = () => {
       return;
     }
     try {
-      await api.addCategory(newCategory);
+      const payload = {
+        ...newCategory,
+        subcategory: subcategory.split(',').map(s => s.trim()).filter(Boolean),
+        thirdcategory: thirdcategory.split(',').map(s => s.trim()).filter(Boolean),
+      };
+      await api.addCategory(payload);
       setFormError("");
       setNewCategory({ categoryname: "", subcategory: "", thirdcategory: "" }); // Reset form
       fetchCategories(); // Refresh the list
     } catch (err) {
-      setFormError(err.message);
+      if (err.response && err.response.data && err.response.data.message) {
+        setFormError(err.response.data.message);
+      } else {
+        setFormError(err.message);
+      }
     }
   };
 
@@ -67,15 +76,25 @@ const CategoryManagement = () => {
   const handleUpdateCategory = async (id) => {
     const { categoryname, subcategory, thirdcategory } = editingCategory;
     if (!categoryname.trim() || !subcategory.trim() || !thirdcategory.trim()) {
-      alert("All category fields are required.");
+      setFormError("All category fields are required.");
       return;
     }
     try {
-      await api.editCategory(id, { categoryname, subcategory, thirdcategory });
+      const payload = {
+        categoryname,
+        subcategory: Array.isArray(subcategory) ? subcategory : subcategory.split(',').map(s => s.trim()).filter(Boolean),
+        thirdcategory: Array.isArray(thirdcategory) ? thirdcategory : thirdcategory.split(',').map(s => s.trim()).filter(Boolean),
+      };
+      await api.editCategory(id, payload);
       setEditingCategory(null); // Exit editing mode
+      setFormError("");
       fetchCategories(); // Refresh the list
     } catch (err) {
-      setError(err.message);
+      if (err.response && err.response.data && err.response.data.message) {
+        setFormError(err.response.data.message);
+      } else {
+        setError(err.message);
+      }
     }
   };
 
@@ -129,7 +148,7 @@ const CategoryManagement = () => {
               onChange={(e) =>
                 setNewCategory({ ...newCategory, subcategory: e.target.value })
               }
-              placeholder="Sub-category"
+              placeholder="Sub-categories (comma-separated)"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
@@ -139,7 +158,7 @@ const CategoryManagement = () => {
               onChange={(e) =>
                 setNewCategory({ ...newCategory, thirdcategory: e.target.value })
               }
-              placeholder="Third-level Category"
+              placeholder="Third-levels (comma-separated)"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
@@ -168,18 +187,17 @@ const CategoryManagement = () => {
                 <tr key={category._id}>
                   {editingCategory && editingCategory._id === category._id ? (
                     <>
-                      <td className="py-4 px-4">
-                        <input type="text" value={editingCategory.categoryname} onChange={(e) => setEditingCategory({ ...editingCategory, categoryname: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded-md"/>
-                      </td>
-                      <td className="py-4 px-4">
-                        <input type="text" value={editingCategory.subcategory} onChange={(e) => setEditingCategory({ ...editingCategory, subcategory: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded-md"/>
-                      </td>
-                      <td className="py-4 px-4">
-                        <input type="text" value={editingCategory.thirdcategory} onChange={(e) => setEditingCategory({ ...editingCategory, thirdcategory: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded-md"/>
-                      </td>
+                      <td className="py-4 px-4"><input type="text" value={editingCategory.categoryname} onChange={(e) => setEditingCategory({ ...editingCategory, categoryname: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded-md"/></td>
+                      <td className="py-4 px-4"><input type="text" value={Array.isArray(editingCategory.subcategory) ? editingCategory.subcategory.join(', ') : editingCategory.subcategory} onChange={(e) => setEditingCategory({ ...editingCategory, subcategory: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded-md"/></td>
+                      <td className="py-4 px-4"><input type="text" value={Array.isArray(editingCategory.thirdcategory) ? editingCategory.thirdcategory.join(', ') : editingCategory.thirdcategory} onChange={(e) => setEditingCategory({ ...editingCategory, thirdcategory: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded-md"/></td>
                       <td className="py-4 px-4 whitespace-nowrap">
-                        <button onClick={() => handleUpdateCategory(category._id)} className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 mr-2">Save</button>
-                        <button onClick={() => setEditingCategory(null)} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600">Cancel</button>
+                        <div className="flex flex-col">
+                          <div>
+                            <button onClick={() => handleUpdateCategory(category._id)} className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 mr-2">Save</button>
+                            <button onClick={() => { setEditingCategory(null); setFormError(""); }} className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600">Cancel</button>
+                          </div>
+                          {formError && <p className="text-red-500 text-xs mt-1">{formError}</p>}
+                        </div>
                       </td>
                     </>
                   ) : (
@@ -188,10 +206,10 @@ const CategoryManagement = () => {
                         <div className="text-sm font-medium text-gray-900">{category.categoryname}</div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-sm text-gray-500">{category.subcategory || '-'}</div>
+                        <div className="text-sm text-gray-500">{Array.isArray(category.subcategory) ? category.subcategory.join(', ') : (category.subcategory || '-')}</div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-sm text-gray-500">{category.thirdcategory}</div>
+                        <div className="text-sm text-gray-500">{Array.isArray(category.thirdcategory) ? category.thirdcategory.join(', ') : (category.thirdcategory || '-')}</div>
                       </td>
                       <td className="py-4 px-4 text-sm font-medium flex">
                         <button onClick={() => startEditing(category)} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2">Edit</button>

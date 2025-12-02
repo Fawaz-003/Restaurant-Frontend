@@ -7,6 +7,7 @@ const ShopManagement = () => {
   const api = useApi();
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [newShop, setNewShop] = useState({
     storeName: "",
     description: "",
@@ -15,6 +16,7 @@ const ShopManagement = () => {
       name: "",
       contact: "",
     },
+    seller: "",
   });
   const [editingShop, setEditingShop] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ const ShopManagement = () => {
       setLoading(true);
       setError(null);
       const response = await api.listShops();
-      setShops(response.data); // The response.data is the array of shops
+      setShops(response.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,10 +38,37 @@ const ShopManagement = () => {
     }
   };
 
+  // Fetch all users and filter for sellers
+  const fetchSellers = async () => {
+    try {
+      const response = await api.getAllUsers();
+      if (response && Array.isArray(response.users)) {
+        const sellerUsers = response.users.filter(user => user.role === 'Seller');
+        setSellers(sellerUsers);
+      }
+    } catch (err) {
+      console.error("Failed to fetch sellers:", err);
+    }
+  };
+
   // Fetch shops on component mount
   useEffect(() => {
     fetchShops();
+    fetchSellers();
   }, []);
+
+  // Handle seller selection - auto-fill owner name
+  const handleSellerChange = (sellerId) => {
+    const selectedSeller = sellers.find(seller => seller._id === sellerId);
+    setNewShop({
+      ...newShop,
+      seller: sellerId,
+      shopOwner: {
+        ...newShop.shopOwner,
+        name: selectedSeller ? selectedSeller.name : "",
+      }
+    });
+  };
 
   // Handle adding a new shop
   const handleAddShop = async (e) => {
@@ -48,21 +77,25 @@ const ShopManagement = () => {
       !newShop.storeName.trim() ||
       !newShop.shopOwner.name.trim() ||
       !newShop.shopOwner.contact.trim() ||
-      !newShop.address.trim()
+      !newShop.address.trim() ||
+      !newShop.seller
     ) {
-      setFormError("All shop fields are required.");
+      setFormError("All fields, including selecting a seller, are required.");
       return;
     }
     try {
+      // Call the API with the newShop state object
       await api.addShop(newShop);
+      
       setFormError("");
       setNewShop({
         storeName: "",
         description: "",
         address: "",
         shopOwner: { name: "", contact: "" },
-      }); // Reset form
-      fetchShops(); // Refresh the list
+        seller: "",
+      });
+      fetchShops();
     } catch (err) {
       setFormError(err.message);
     }
@@ -73,7 +106,7 @@ const ShopManagement = () => {
     if (window.confirm("Are you sure you want to delete this shop?")) {
       try {
         await api.deleteShop(id);
-        fetchShops(); // Refresh the list
+        fetchShops();
       } catch (err) {
         setError(err.message);
       }
@@ -93,12 +126,10 @@ const ShopManagement = () => {
       return;
     }
     try {
-      // Destructure to remove fields that shouldn't be sent in the update
       const { menu, reviews, ...updateData } = editingShop;
-
       await api.updateShop(id, updateData);
-      setEditingShop(null); // Exit editing mode
-      fetchShops(); // Refresh the list
+      setEditingShop(null);
+      fetchShops();
     } catch (err) {
       setError(err.message);
     }
@@ -106,7 +137,6 @@ const ShopManagement = () => {
 
   // Enter editing mode
   const startEditing = (shop) => {
-    // Ensure shopOwner exists to prevent errors
     setEditingShop({
       ...shop,
       shopOwner: shop.shopOwner || { name: "", contact: "" },
@@ -152,18 +182,20 @@ const ShopManagement = () => {
             placeholder="Shop Name"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-          <input
-            type="text"
-            value={newShop.shopOwner.name}
-            onChange={(e) =>
-              setNewShop({
-                ...newShop,
-                shopOwner: { ...newShop.shopOwner, name: e.target.value },
-              })
-            }
-            placeholder="Owner Name"
+          <select
+            value={newShop.seller}
+            onChange={(e) => handleSellerChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          >
+            <option value="" disabled>
+              Select a Seller
+            </option>
+            {sellers.map((seller) => (
+              <option key={seller._id} value={seller._id}>
+                {seller.name}
+              </option>
+            ))}
+          </select>
           <input
             type="text"
             value={newShop.shopOwner.contact}
@@ -219,142 +251,137 @@ const ShopManagement = () => {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {Array.isArray(shops) &&
-              shops.map(
-                (
-                  shop // Ensure shops is an array
-                ) => (
-                  <tr
-                    key={shop._id}
-                    className="hover:bg-gray-50"
-                  >
-                    {editingShop && editingShop._id === shop._id ? (
-                      <>
-                        {/* Stop propagation to prevent modal from opening in edit mode */}
-                        <td
-                          className="py-4 px-4"
-                          onClick={(e) => e.stopPropagation()}
+              shops.map((shop) => (
+                <tr
+                  key={shop._id}
+                  className="hover:bg-gray-50"
+                >
+                  {editingShop && editingShop._id === shop._id ? (
+                    <>
+                      <td
+                        className="py-4 px-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="text"
+                          value={editingShop.storeName}
+                          onChange={(e) =>
+                            setEditingShop({
+                              ...editingShop,
+                              storeName: e.target.value,
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md"
+                        />
+                      </td>
+                      <td
+                        className="py-4 px-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="text"
+                          value={editingShop.shopOwner.name}
+                          onChange={(e) =>
+                            setEditingShop({
+                              ...editingShop,
+                              shopOwner: {
+                                ...editingShop.shopOwner,
+                                name: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md"
+                        />
+                      </td>
+                      <td
+                        className="py-4 px-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="text"
+                          value={editingShop.shopOwner.contact}
+                          onChange={(e) =>
+                            setEditingShop({
+                              ...editingShop,
+                              shopOwner: {
+                                ...editingShop.shopOwner,
+                                contact: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md"
+                        />
+                      </td>
+                      <td
+                        className="py-4 px-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="text"
+                          value={editingShop.address}
+                          onChange={(e) =>
+                            setEditingShop({
+                              ...editingShop,
+                              address: e.target.value,
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md"
+                        />
+                      </td>
+                      <td
+                        className="py-4 px-4 whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={() => handleUpdateShop(shop._id)}
+                          className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 mr-2"
                         >
-                          <input
-                            type="text"
-                            value={editingShop.storeName}
-                            onChange={(e) =>
-                              setEditingShop({
-                                ...editingShop,
-                                storeName: e.target.value,
-                              })
-                            }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                          />
-                        </td>
-                        <td
-                          className="py-4 px-4"
-                          onClick={(e) => e.stopPropagation()}
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingShop(null)}
+                          className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600"
                         >
-                          <input
-                            type="text"
-                            value={editingShop.shopOwner.name}
-                            onChange={(e) =>
-                              setEditingShop({
-                                ...editingShop,
-                                shopOwner: {
-                                  ...editingShop.shopOwner,
-                                  name: e.target.value,
-                                },
-                              })
-                            }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                          />
-                        </td>
-                        <td
-                          className="py-4 px-4"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <input
-                            type="text"
-                            value={editingShop.shopOwner.contact}
-                            onChange={(e) =>
-                              setEditingShop({
-                                ...editingShop,
-                                shopOwner: {
-                                  ...editingShop.shopOwner,
-                                  contact: e.target.value,
-                                },
-                              })
-                            }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                          />
-                        </td>
-                        <td
-                          className="py-4 px-4"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <input
-                            type="text"
-                            value={editingShop.address}
-                            onChange={(e) =>
-                              setEditingShop({
-                                ...editingShop,
-                                address: e.target.value,
-                              })
-                            }
-                            className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                          />
-                        </td>
-                        <td
-                          className="py-4 px-4 whitespace-nowrap"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                          Cancel
+                        </button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="py-4 px-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {shop.storeName}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-sm text-gray-500">
+                          {shop.shopOwner?.name}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-sm text-gray-500">
+                          {shop.shopOwner?.contact}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="text-sm text-gray-500">
+                          {shop.address}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-sm font-medium">
+                        <div className="flex">
                           <button
-                            onClick={() => handleUpdateShop(shop._id)}
-                            className="px-3 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600 mr-2"
+                            onClick={() => setSelectedShopId(shop._id)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2"
                           >
-                            Save
+                            View Details
                           </button>
-                          <button
-                            onClick={() => setEditingShop(null)}
-                            className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600"
-                          >
-                            Cancel
-                          </button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="py-4 px-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {shop.storeName}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-sm text-gray-500">
-                            {shop.shopOwner?.name}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-sm text-gray-500">
-                            {shop.shopOwner?.contact}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="text-sm text-gray-500">
-                            {shop.address}
-                          </div>
-                        </td>
-                        <td className="py-4 px-4 text-sm font-medium">
-                          <div className="flex">
-                            <button
-                              onClick={() => setSelectedShopId(shop._id)} // Open the modal
-                              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-2"
-                            >
-                              View Details
-                            </button>
-                          </div>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                )
-              )}
+                        </div>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
