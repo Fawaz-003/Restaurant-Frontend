@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { menuItems, categories } from '../Components/Menu/MenuItems';
 import MenuHeader from '../Components/Menu/MenuHeader';
 import MenuItemCard from '../Components/Menu/MenuCard';
 import CartSidebar from '../Components/Menu/CartSidebar';
 
 const ShopMenu = () => {
+  const location = useLocation();
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Restore cart from navigation state when coming back from checkout
+  useEffect(() => {
+    if (location.state?.cart && location.state?.preserveCart) {
+      setCart(location.state.cart);
+    }
+  }, [location.state]);
 
   // Filter best food items (you can define your own logic, e.g., rating > 4.5)
   const bestFoodItems = menuItems.filter(item => item.rating > 4.5);

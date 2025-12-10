@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingCart, X } from 'lucide-react';
 import CartItem from './CartItems';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const CartSidebar = ({
   cart,
@@ -11,6 +11,7 @@ const CartSidebar = ({
   getTotalPrice,
   getTotalItems
 }) => {
+  const location = useLocation();
   return (
     <div className={`bg-white ${isMobile ? 'w-full max-w-md h-full shadow-2xl flex flex-col' : 'rounded-2xl shadow-lg overflow-hidden flex flex-col'}`}>
       {/* Header - Fixed height */}
@@ -51,14 +52,10 @@ const CartSidebar = ({
 
       {cart.length > 0 && (
         <div className="border-t border-gray-200 p-6 space-y-4 flex-shrink-0">
-          <div className="flex justify-between items-center text-md">
-            <span className="font-semibold">Subtotal:</span>
-            <span className="font-bold text-gray-900">₹{getTotalPrice()}</span>
-          </div>
-          <div className="border-t border-gray-200 pt-4 flex justify-between items-center text-xl">
-            <span className="font-bold">Total:</span>
+          <div className="flex justify-between items-center text-lg py-4">
+            <span className="font-bold">Total Amount:</span>
             <span className="font-bold text-orange-600">
-              ₹{getTotalPrice() + Math.round(getTotalPrice() * 0.05)}
+              ₹{getTotalPrice()}
             </span>
           </div>
         <div className='text-center'>
@@ -67,10 +64,10 @@ const CartSidebar = ({
             state={{
               totalItems: getTotalItems(),
               totalPrice: getTotalPrice(),
-              finalAmount: getTotalPrice() + Math.round(getTotalPrice() * 0.05),
               cart,
+              from: location.pathname, // Pass current path for back navigation
             }}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg  text-sm sm:text-[16px] shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full  bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg  text-sm sm:text-[16px] shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Proceed to Checkout
           </Link>

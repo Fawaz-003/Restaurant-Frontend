@@ -13,8 +13,9 @@ const SuccessScreen = ({ selectedAddress, totals, selectedPayment, onReset }) =>
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center p-4 min-h-screen">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-12 h-12 text-green-600" />
         </div>
@@ -38,6 +39,7 @@ const SuccessScreen = ({ selectedAddress, totals, selectedPayment, onReset }) =>
         >
           Back to Home
         </Link>
+        </div>
       </div>
     </div>
   );
