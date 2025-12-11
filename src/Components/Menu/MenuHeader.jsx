@@ -4,6 +4,11 @@ import { ShoppingCart, Star } from 'lucide-react';
 
 
 const MenuHeader = ({
+  searchQuery = "",
+  selectedCategory = "All",
+  categories = [],
+  onSearchChange,
+  onCategoryChange,
   totalItems,
   onShowCart,
   bestFoodItems
@@ -16,6 +21,7 @@ const MenuHeader = ({
   return (
     <div className="bg-white  sticky top-20 sm:top-20 z-40">
       <div className="max-w-7xl mx-auto sm:py-2">
+
         <div className="lg:hidden flex items-center justify-between mb-4">
           <div className="flex-1">
             <h2 className="text-sm sm:text-lg font-bold text-gray-800">Highly Recommended</h2>

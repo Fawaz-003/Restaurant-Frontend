@@ -38,7 +38,7 @@ const Profile = () => {
   const fetchAddresses = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${baseURL}/api/user/addresses`, {
+      const response = await fetch(`${baseURL}/api/users/addresses`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
           'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ const Profile = () => {
   
   const fetchUserPreferences = async () => {
     try {
-      const response = await fetch(`${baseURL}/api/user/preferences`, {
+      const response = await fetch(`${baseURL}/api/users/preferences`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
           'Content-Type': 'application/json',
@@ -96,8 +96,8 @@ const Profile = () => {
     try {
       setIsSaving(true);
       const url = editingAddress 
-        ? `${baseURL}/api/user/addresses/${editingAddress.id}`
-        : `${baseURL}/api/user/addresses`;
+        ? `${baseURL}/api/users/addresses/${editingAddress.id}`
+        : `${baseURL}/api/users/addresses`;
       
       const method = editingAddress ? 'PUT' : 'POST';
       
@@ -132,7 +132,7 @@ const Profile = () => {
   const handleSaveProfile = async (form) => {
     try {
       setIsSaving(true);
-      const response = await fetch(`${baseURL}/api/user/profile`, {
+      const response = await fetch(`${baseURL}/api/users/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
@@ -160,7 +160,7 @@ const Profile = () => {
   const handleSavePassword = async (form) => {
     try {
       setIsSaving(true);
-      const response = await fetch(`${baseURL}/api/user/password`, {
+      const response = await fetch(`${baseURL}/api/users/password`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
@@ -186,7 +186,7 @@ const Profile = () => {
 
   const handleDeleteAddress = async (addressId) => {
     try {
-      const response = await fetch(`${baseURL}/api/user/addresses/${addressId}`, {
+      const response = await fetch(`${baseURL}/api/users/addresses/${addressId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
@@ -208,7 +208,7 @@ const Profile = () => {
 
   const handleSetDefaultAddress = async (addressId) => {
     try {
-      const response = await fetch(`${baseURL}/api/user/addresses/${addressId}/set-default`, {
+      const response = await fetch(`${baseURL}/api/users/addresses/${addressId}/set-default`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
@@ -230,7 +230,7 @@ const Profile = () => {
 
   const handleUpdatePreferences = async (type, value) => {
     try {
-      const response = await fetch(`${baseURL}/api/user/preferences`, {
+      const response = await fetch(`${baseURL}/api/users/preferences`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,

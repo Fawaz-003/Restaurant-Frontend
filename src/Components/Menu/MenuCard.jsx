@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Star, Plus, Heart } from 'lucide-react';
 
-const MenuItemCard = ({ item, onAddToCart, onToggleWishlist }) => {
-  const [wishlisted, setWishlisted] = useState(false);
+const MenuItemCard = ({ item, onAddToCart, onToggleWishlist, isWishlisted }) => {
+  const rating = item.rating ?? 4.5;
 
   const toggleWishlist = () => {
-    setWishlisted(!wishlisted);
     if (onToggleWishlist) onToggleWishlist(item);
   };
 
@@ -18,7 +17,7 @@ const MenuItemCard = ({ item, onAddToCart, onToggleWishlist }) => {
       >
         <Heart
           className={`w-5 h-5 transition-all ${
-            wishlisted ? "fill-red-500 text-red-500" : "text-gray-500"
+            isWishlisted ? "fill-red-500 text-red-500" : "text-gray-500"
           }`}
         />
       </button>
@@ -33,7 +32,7 @@ const MenuItemCard = ({ item, onAddToCart, onToggleWishlist }) => {
 
           <div className="absolute top-2 right-2 bg-white px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-xs font-semibold">{item.rating}</span>
+            <span className="text-xs font-semibold">{rating}</span>
           </div>
         </div>
 
@@ -64,7 +63,7 @@ const MenuItemCard = ({ item, onAddToCart, onToggleWishlist }) => {
 
           <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-semibold">{item.rating}</span>
+            <span className="text-sm font-semibold">{rating}</span>
           </div>
         </div>
 

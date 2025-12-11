@@ -9,7 +9,8 @@ const CartSidebar = ({
   onClose,
   onUpdateQuantity,
   getTotalPrice,
-  getTotalItems
+  getTotalItems,
+  shopInfo = null,
 }) => {
   const location = useLocation();
   return (
@@ -65,6 +66,7 @@ const CartSidebar = ({
               totalItems: getTotalItems(),
               totalPrice: getTotalPrice(),
               cart,
+              shopInfo,
               from: location.pathname, // Pass current path for back navigation
             }}
             className="w-full  bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg  text-sm sm:text-[16px] shadow-lg hover:shadow-xl transition-all duration-300"

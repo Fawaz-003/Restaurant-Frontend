@@ -1,50 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, X, ChevronRight, ListOrdered } from 'lucide-react';
 import AddressSection from '../Components/Checkout/AddressSection';
 import PaymentSection from '../Components/Checkout/PaymentSection';
 import OrderSummary from '../Components/Checkout/OrderSummary';
 import SuccessScreen from '../Components/Checkout/SuccessScreen';
+import { useAppContext } from '../Context/AppContext';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { baseURL, token, userData } = useAppContext();
   const [step, setStep] = useState('address');
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [userClearedAddress, setUserClearedAddress] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [upiId, setUpiId] = useState('');
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [isPaying, setIsPaying] = useState(false);
 
-  const cartData = location.state || {
-    cart: [
-      {
-        id: 1,
-        name: 'Fruit Salad With Strawberry Icecream',
-        price: 280,
-        quantity: 2,
-        image: 'https://images.unsplash.com/photo-1567095761054-7a02e69e5c43?w=150&h=150&fit=crop&crop=center'
-      },
-      {
-        id: 2,
-        name: 'Grilled Chicken Sandwich',
-        price: 180,
-        quantity: 1,
-        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&h=150&fit=crop&crop=center'
-      }
-    ]
-  };
+  const cartKey = userData?._id ? `cart_${userData._id}` : "cart_guest";
+  const ordersKey = userData?._id ? `orders_${userData._id}` : "orders_guest";
 
-  const [cartItems, setCartItems] = useState(cartData.cart || cartData);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      label: 'Home',
-      street: 'Mosque Street',
-      address: '17/2, Mosque Street, Pallikonda, New Mohalla, Tamil Nadu 635809, India',
-      phone: '9876543210',
-      deliveryTime: '54 MINS',
-    }
-  ]);
+  const cartData = location.state || { cart: [] };
+  const shopInfo = cartData.shopInfo || null;
+
+  const initialCart = cartData.cart && cartData.cart.length
+    ? cartData.cart
+    : JSON.parse(localStorage.getItem(cartKey) || "[]");
+
+  const [cartItems, setCartItems] = useState(initialCart || []);
+  const [addresses, setAddresses] = useState([]);
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [addressError, setAddressError] = useState(null);
 
   const handleBack = () => {
     if (step === 'payment') {
@@ -74,13 +63,85 @@ const Checkout = () => {
   };
 
   const handleSelectAddress = (address) => {
+    // When user taps CHANGE, address becomes null and we return to selection step
+    if (!address) {
+      setStep("address");
+      setUserClearedAddress(true);
+    }
+    if (address) {
+      setUserClearedAddress(false);
+    }
     setSelectedAddress(address);
   };
-  const handleAddNewAddress = (newAddr) => {
-    const newId = addresses.length + 1;
-    const addressWithId = { ...newAddr, id: newId };
-    setAddresses(prev => [...prev, addressWithId]);
-    setSelectedAddress(addressWithId);
+  const fetchAddresses = useCallback(async () => {
+    if (!baseURL || !token) return;
+    setAddressLoading(true);
+    setAddressError(null);
+    try {
+      const response = await fetch(`${baseURL}/api/users/addresses`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to load addresses");
+      }
+      const data = await response.json();
+      const normalized = (data.addresses || []).map((addr, index) => ({
+        id: addr.id || addr._id || index,
+        label: addr.label || "Home",
+        street: addr.line1 || addr.street || "",
+        address: addr.address || addr.line2 || addr.fullAddress || "",
+        phone: addr.phone || addr.mobile || "",
+        deliveryTime: addr.deliveryTime || "45-60 MINS",
+        raw: addr,
+      }));
+      setAddresses(normalized);
+      if (normalized.length && !selectedAddress && !userClearedAddress) {
+        const defaultAddr =
+          normalized.find((a) => a.raw?.isDefault) || normalized[0];
+        setSelectedAddress(defaultAddr);
+      }
+      return normalized;
+    } catch (error) {
+      setAddressError(error.message || "Unable to fetch addresses");
+      setAddresses([]);
+      setSelectedAddress(null);
+      return [];
+    } finally {
+      setAddressLoading(false);
+    }
+  }, [baseURL, token, selectedAddress]);
+
+  const handleAddNewAddress = async (newAddr) => {
+    if (!baseURL || !token) return;
+    try {
+      const response = await fetch(`${baseURL}/api/users/addresses`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          label: newAddr.label,
+          street: newAddr.street,
+          address: newAddr.address,
+          phone: newAddr.phone,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to save address");
+      }
+      const updated = await fetchAddresses();
+      if (updated?.length) {
+        const latest = updated[updated.length - 1];
+        setSelectedAddress(latest);
+        setUserClearedAddress(false);
+      }
+    } catch (error) {
+      setAddressError(error.message || "Unable to save address");
+    }
   };
 
   const calculateTotals = () => {
@@ -118,9 +179,59 @@ const Checkout = () => {
     }
   };
 
-  const handleCompleteOrder = (paymentResponse = null) => {
-    console.log("Razorpay Response:", paymentResponse);
-
+  const handleCompleteOrder = async (paymentResponse = null) => {
+    setIsPaying(false);
+    const orderPayload = {
+      id: `ORD-${Date.now()}`,
+      items: cartItems,
+      total: totals.grandTotal,
+      status: "Processing",
+      date: new Date().toLocaleDateString(),
+      address: selectedAddress?.address || "",
+      deliveryTime: "Estimated soon",
+      paymentMethod: selectedPayment || "online",
+      paymentResponse,
+      restaurant:
+        shopInfo?.name ||
+        shopInfo?.storeName ||
+        shopInfo?.title ||
+        "Restaurant",
+      restaurantInfo: {
+        id: shopInfo?.id || shopInfo?._id,
+        name: shopInfo?.name || shopInfo?.storeName || shopInfo?.title,
+        image: shopInfo?.image?.url || shopInfo?.image || "",
+        address:
+          shopInfo?.address ||
+          shopInfo?.location?.address ||
+          shopInfo?.location?.title ||
+          "",
+      },
+    };
+    try {
+      if (token) {
+        await axios.post(
+          `${baseURL}/api/users/orders`,
+          {
+            orderId: orderPayload.id,
+            shopId: orderPayload.restaurantInfo.id,
+            items: orderPayload.items,
+            totalAmount: orderPayload.total,
+            paymentStatus: selectedPayment === "online" ? "Paid" : "Pending",
+            orderStatus: "Placed",
+            deliveryAddress: orderPayload.address,
+            restaurantInfo: orderPayload.restaurantInfo,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Failed to store order in backend", error);
+    }
+    // clear cart after placing order
+    localStorage.removeItem(cartKey);
+    setCartItems([]);
     setStep("success");
   };
 
@@ -135,6 +246,94 @@ const Checkout = () => {
   useEffect(() => {
     setShowOrderSummary(false);
   }, [step]);
+
+  useEffect(() => {
+    fetchAddresses();
+  }, [fetchAddresses]);
+
+  // Payment helpers
+  const loadRazorpayScript = (src) => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const startOnlinePayment = async () => {
+    setIsPaying(true);
+    try {
+      const isScriptLoaded = await loadRazorpayScript(
+        "https://checkout.razorpay.com/v1/checkout.js"
+      );
+      if (!isScriptLoaded) {
+        alert("Razorpay failed to load.");
+        setIsPaying(false);
+        return;
+      }
+
+      const { data } = await axios.post(
+        `${baseURL}/api/payment/create-order`,
+        { amount: totals.grandTotal }
+      );
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: "INR",
+        name: "Your Restaurant",
+        description: "Food Order",
+        order_id: data.orderId,
+
+        handler: async function (response) {
+          const verificationRes = await axios.post(
+            `${baseURL}/api/payment/verify-payment`,
+            {
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+            }
+          );
+
+          if (verificationRes.data.success) {
+            handleCompleteOrder(response);
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            setIsPaying(false);
+          },
+        },
+      };
+
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.open();
+    } catch (error) {
+      console.log(error);
+      setIsPaying(false);
+    } finally {
+      // In case handler doesn't run due to errors
+      if (isPaying) {
+        setIsPaying(false);
+      }
+    }
+  };
+
+  const handlePrimaryAction = async () => {
+    if (step === 'address') {
+      handleProceedToPayment();
+      return;
+    }
+    if (!selectedPayment) return;
+    if (selectedPayment === 'online') {
+      await startOnlinePayment();
+      return;
+    }
+    await handleCompleteOrder();
+  };
 
   if (step === 'success') {
     return (
@@ -253,13 +452,13 @@ const Checkout = () => {
                   selectedAddress={selectedAddress}
                   onSelectAddress={handleSelectAddress}
                   onAddNewAddress={handleAddNewAddress}
+                  loading={addressLoading}
+                  error={addressError}
                 />
               ) : (
                 <PaymentSection
                   selectedPayment={selectedPayment}
                   onSelectPayment={setSelectedPayment}
-                  cartTotal={totals.grandTotal}
-                  onContinue={handleCompleteOrder}
                 />
 
 
@@ -277,7 +476,8 @@ const Checkout = () => {
                   selectedPayment={selectedPayment}
                   upiId={upiId}
                   onProceedToPayment={handleProceedToPayment}
-                  onCompleteOrder={handleCompleteOrder}
+                  onPrimaryAction={handlePrimaryAction}
+                  isPaying={isPaying}
                 />
               </div>
             </div>
@@ -302,10 +502,11 @@ const Checkout = () => {
                       setShowOrderSummary(false);
                       handleProceedToPayment();
                     }}
-                    onCompleteOrder={() => {
+                    onPrimaryAction={() => {
                       setShowOrderSummary(false);
-                      handleCompleteOrder();
+                      handlePrimaryAction();
                     }}
+                    isPaying={isPaying}
                   />
                 </div>
               </div>
@@ -322,14 +523,14 @@ const Checkout = () => {
               <div className="font-bold text-lg text-gray-900">₹{totals.grandTotal.toLocaleString()}</div>
             </div>
             <button
-              onClick={step === 'address' ? handleProceedToPayment : handleCompleteOrder}
+              onClick={handlePrimaryAction}
               disabled={
                 (step === 'address' && !selectedAddress) ||
-                (step === 'payment' && (!selectedPayment || (selectedPayment === 'upi' && !upiId))) ||
+                (step === 'payment' && (!selectedPayment || (selectedPayment === 'upi' && !upiId) || isPaying)) ||
                 cartItems.length === 0
               }
               className={`px-5 py-2.5 rounded-lg font-semibold text-white text-sm ${(step === 'address' && !selectedAddress) ||
-                (step === 'payment' && (!selectedPayment || (selectedPayment === 'upi' && !upiId))) ||
+                (step === 'payment' && (!selectedPayment || (selectedPayment === 'upi' && !upiId) || isPaying)) ||
                 cartItems.length === 0
                 ? 'bg-gray-300 cursor-not-allowed'
                 : 'bg-green-600 hover:bg-green-700'
@@ -337,7 +538,9 @@ const Checkout = () => {
             >
               {step === 'address'
                 ? (selectedAddress ? 'Proceed to Payment' : 'Select Address')
-                : (selectedPayment ? 'Place Order' : 'Select Payment')
+                : (selectedPayment
+                  ? (selectedPayment === 'online' ? (isPaying ? 'Processing...' : 'Pay & Place Order') : 'Place Order')
+                  : 'Select Payment')
               }
             </button>
           </div>

@@ -4,6 +4,10 @@ import { X, CircleUserRound, PhoneCall, MapPin } from "lucide-react";
 const ShopDetailsModal= ({ shop, onClose }) => {
   if (!shop) return null;
 
+  const locationTitle = shop.location?.title || shop.address || "Location not available";
+  const locationDesc = shop.location?.desc || "";
+  const locationAddress = shop.location?.address || shop.address || "";
+
   return (
     <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-[1px] flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl border border-gray-100 relative animate-in fade-in-90 zoom-in-95">
@@ -46,9 +50,9 @@ const ShopDetailsModal= ({ shop, onClose }) => {
             <div>
               <p className="font-medium text-gray-800">Location</p>
               <p className="text-sm text-gray-600">
-                {shop.location.title}, {shop.location.desc}
+                {locationTitle}{locationDesc ? `, ${locationDesc}` : ""}
                 <br />
-                <span className="text-gray-500">{shop.location.address}</span>
+                <span className="text-gray-500">{locationAddress}</span>
               </p>
             </div>
           </div>

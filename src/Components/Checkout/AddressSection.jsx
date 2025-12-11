@@ -60,7 +60,7 @@ const modalCard = {
 };
 const btnTap = { scale: 0.98 };
 
-const AddressSection = ({ addresses, selectedAddress, onSelectAddress, onAddNewAddress }) => {
+const AddressSection = ({ addresses, selectedAddress, onSelectAddress, onAddNewAddress, loading = false, error = null }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [newAddress, setNewAddress] = useState({
@@ -176,6 +176,14 @@ const AddressSection = ({ addresses, selectedAddress, onSelectAddress, onAddNewA
     );
   }
 
+  if (loading) {
+    return (
+      <div className="bg-white lg:bg-gray-100 p-4">
+        <p className="text-gray-600">Loading addresses...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white lg:bg-gray-100">
       <div className="max-w-6xl mx-auto px-0 lg:px-0">
@@ -190,6 +198,9 @@ const AddressSection = ({ addresses, selectedAddress, onSelectAddress, onAddNewA
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-6 px-4">
+          {error && (
+            <div className="col-span-full text-red-600 text-sm mb-2">{error}</div>
+          )}
           {addresses.map((addr) => (
             <div
               key={addr.id}

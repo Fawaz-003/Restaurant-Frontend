@@ -98,6 +98,19 @@ export const createApiFunctions = (baseURL, token) => {
     });
   };
 
+  const getWishlist = async () => {
+    return apiCall(baseURL, token, "/api/users/wishlist", {
+      method: "GET",
+    });
+  };
+
+  const toggleWishlist = async (item) => {
+    return apiCall(baseURL, token, "/api/users/wishlist", {
+      method: "POST",
+      body: JSON.stringify(item),
+    });
+  };
+
   // Google OAuth - redirect to Google
   const googleAuth = () => {
     window.location.href = `${baseURL}/api/users/google`;
@@ -282,6 +295,8 @@ export const createApiFunctions = (baseURL, token) => {
     loginUser,
     adminLogin,
     getMe,
+    getWishlist,
+    toggleWishlist,
     googleAuth,
     adminCreateUser,
     getAllUsers,
@@ -339,6 +354,17 @@ export const api = {
     apiCall(baseURL, null, "/api/users/admin", {
       method: "POST",
       body: JSON.stringify(credentials),
+    }),
+
+  getWishlist: (baseURL, token) =>
+    apiCall(baseURL, token, "/api/users/wishlist", {
+      method: "GET",
+    }),
+
+  toggleWishlist: (baseURL, token, item) =>
+    apiCall(baseURL, token, "/api/users/wishlist", {
+      method: "POST",
+      body: JSON.stringify(item),
     }),
   
   getMe: (baseURL, token) => 

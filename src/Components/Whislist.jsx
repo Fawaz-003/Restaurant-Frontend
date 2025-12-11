@@ -1,42 +1,71 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Heart, ShoppingCart, Trash2, Star } from "lucide-react";
+import { useAppContext } from "../Context/AppContext";
 
 // Professional Wishlist Component
 const Wishlist = () => {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: "Chicken Biryani",
-      price: 180,
-      image: "/biryani.jpg",
-      rating: 4.5,
-      description: "Aromatic basmati rice cooked with tender chicken and exotic spices",
-    },
-    {
-      id: 2,
-      name: "Cheese Pizza",
-      price: 240,
-      image: "/pizza.jpg",
-      rating: 4.7,
-      description: "Thin crust pizza with mozzarella, cheddar, and parmesan cheese",
-    },
-    {
-      id: 3,
-      name: "Burger Deluxe",
-      price: 150,
-      image: "/burger.jpg",
-      rating: 4.3,
-      description: "Juicy beef patty with fresh vegetables and special sauce",
-    },
-  ]);
+  const { wishlist, fetchWishlist, toggleWishlistItem, userData } = useAppContext();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const removeItem = (id) => {
-    setItems(items.filter((item) => item.id !== id));
+  const cartKey = userData?._id ? `cart_${userData._id}` : "cart_guest";
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        await fetchWishlist();
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [fetchWishlist]);
+
+  const removeItem = async (item) => {
+    try {
+      await toggleWishlistItem(item);
+      setMessage("Removed from wishlist");
+      setTimeout(() => setMessage(""), 1500);
+    } catch (error) {
+      setMessage(error.message || "Unable to update wishlist");
+      setTimeout(() => setMessage(""), 1500);
+    }
   };
 
   const addToCart = (item) => {
-    console.log("Added to cart:", item);
-    // Add to cart logic here
+    const existingCart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+    const idx = existingCart.findIndex(
+      (c) => String(c.productId || c.id || c._id) === String(item.productId || item.id || item._id)
+    );
+    if (idx >= 0) {
+      existingCart[idx].quantity = (existingCart[idx].quantity || 1) + 1;
+    } else {
+      existingCart.push({ ...item, quantity: 1 });
+    }
+    localStorage.setItem(cartKey, JSON.stringify(existingCart));
+    setMessage("Added to cart");
+    setTimeout(() => setMessage(""), 1500);
+  };
+
+  const items = useMemo(() => {
+    return (wishlist || []).map((item) => ({
+      ...item,
+      id: item.productId || item.id || item._id,
+      name: item.name || "Item",
+      price: item.price ?? 0,
+      image: item.image || "",
+      rating: item.rating ?? 0,
+      description: item.description || "",
+    }));
+  }, [wishlist]);
+
+  const clearAll = async () => {
+    for (const item of items) {
+      await toggleWishlistItem(item);
+    }
+    setMessage("Cleared wishlist");
+    setTimeout(() => setMessage(""), 1500);
   };
 
   return (
@@ -51,6 +80,14 @@ const Wishlist = () => {
                 Wishlist
               </h1>
               <p className="text-gray-600 mt-2">Save your favorite items for later</p>
+              {!userData && (
+                <p className="text-sm text-orange-600 mt-1">Login to sync wishlist across devices.</p>
+              )}
+              {message && (
+                <p className="text-sm text-green-700 mt-2 bg-green-50 border border-green-100 rounded px-3 py-1 inline-block">
+                  {message}
+                </p>
+              )}
             </div>
             {items.length > 0 && (
               <div className="px-4 py-2 bg-white border border-gray-300 rounded-lg">
@@ -63,7 +100,11 @@ const Wishlist = () => {
         </div>
 
         {/* Wishlist Items */}
-        {items.length === 0 ? (
+        {loading ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center text-gray-600">
+            Loading wishlist...
+          </div>
+        ) : items.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
             <div className="max-w-md mx-auto">
               <div className="p-4 bg-rose-50 rounded-full inline-flex items-center justify-center mb-6">
@@ -88,18 +129,28 @@ const Wishlist = () => {
                 className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition duration-200"
               >
                 {/* Product Image */}
-                <div className="relative h-48 bg-gradient-to-br from-rose-50 to-orange-50 flex items-center justify-center">
+                <div className="relative h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
                   <div className="absolute top-4 right-4 z-10">
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item)}
                       className="p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition duration-200"
                     >
                       <Trash2 className="w-5 h-5 text-gray-600 hover:text-rose-600" />
                     </button>
                   </div>
-                  {/* Placeholder for product image */}
-                  <div className="text-5xl">🍔</div>
+
+                  {/* Real Product Image */}
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-gray-400 text-3xl">No Image</div>
+                  )}
                 </div>
+
 
                 {/* Product Info */}
                 <div className="p-6">
@@ -126,7 +177,7 @@ const Wishlist = () => {
                       <ShoppingCart className="w-5 h-5" />
                       Add to Cart
                     </button>
-                 
+
                   </div>
                 </div>
               </div>
@@ -134,31 +185,7 @@ const Wishlist = () => {
           </div>
         )}
 
-        {/* Actions Bar (when items exist) */}
-        {items.length > 0 && (
-          <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div>
-                <h3 className="font-semibold text-gray-900">Wishlist Summary</h3>
-                <p className="text-sm text-gray-600">
-                  {items.length} items • Total: ₹
-                  {items.reduce((sum, item) => sum + item.price, 0)}
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setItems([])}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition duration-200"
-                >
-                  Clear All
-                </button>
-                <button className="px-6 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition duration-200">
-                  Add All to Cart
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );

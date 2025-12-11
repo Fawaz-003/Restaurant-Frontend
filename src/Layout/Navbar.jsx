@@ -281,7 +281,7 @@ const Navbar = () => {
                 {authenticated && (
                   <>
                     <NavLink
-                      to="/profile/my-orders"
+                      to="/Orders"
                       onClick={toggleMenu}
                       className={mobileNavLinkClass}
                     >
@@ -289,7 +289,7 @@ const Navbar = () => {
                       <span>My Orders</span>
                     </NavLink>
                     <NavLink
-                      to="/profile/wishlist"
+                      to="/Wishlist"
                       onClick={toggleMenu}
                       className={mobileNavLinkClass}
                     >

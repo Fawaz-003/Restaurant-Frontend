@@ -9,7 +9,8 @@ const OrderSummary = ({
   selectedPayment, 
   upiId, 
   onProceedToPayment, 
-  onCompleteOrder 
+  onPrimaryAction,
+  isPaying = false,
 }) => {
   // Desktop button text
   const getButtonText = () => {
@@ -18,7 +19,8 @@ const OrderSummary = ({
     } else {
       if (!selectedPayment) return 'Select Payment Method';
       if (selectedPayment === 'upi' && !upiId) return 'Enter UPI ID';
-      return 'Complete Order';
+      if (selectedPayment === 'online') return isPaying ? 'Processing...' : 'Pay & Place Order';
+      return 'Place Order';
     }
   };
 
@@ -26,7 +28,7 @@ const OrderSummary = ({
     if (step === 'address') {
       return !selectedAddress;
     } else {
-      return !selectedPayment || (selectedPayment === 'upi' && !upiId);
+      return !selectedPayment || (selectedPayment === 'upi' && !upiId) || isPaying;
     }
   };
 
@@ -125,7 +127,7 @@ const OrderSummary = ({
 
         {/* Desktop Action Button - Hidden on mobile as mobile has bottom action bar */}
         <button
-          onClick={step === 'address' ? onProceedToPayment : onCompleteOrder}
+          onClick={step === 'address' ? onProceedToPayment : onPrimaryAction}
           disabled={isButtonDisabled() || !cartItems || cartItems.length === 0}
           className={`hidden lg:block w-full py-3 rounded-lg font-semibold text-base mt-6 transition ${
             isButtonDisabled() || !cartItems || cartItems.length === 0
