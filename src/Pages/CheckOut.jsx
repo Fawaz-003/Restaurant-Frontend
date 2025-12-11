@@ -14,8 +14,7 @@ const Checkout = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [upiId, setUpiId] = useState('');
   const [showOrderSummary, setShowOrderSummary] = useState(false);
-  
-  // Get cart data from navigation state or use default
+
   const cartData = location.state || {
     cart: [
       {
@@ -47,17 +46,13 @@ const Checkout = () => {
     }
   ]);
 
-  // Handle back button - goes to previous step or back to cart with data preservation
   const handleBack = () => {
     if (step === 'payment') {
-      // Go back to address step, preserve all data
       setStep('address');
     } else {
-      // Go back to shop menu or home, preserve cart data
-      // Check if we have a referrer path, otherwise go to home
       const referrer = document.referrer;
       const fromPath = location.state?.from;
-      
+
       if (fromPath) {
         navigate(fromPath, {
           state: {
@@ -66,10 +61,8 @@ const Checkout = () => {
           }
         });
       } else if (referrer && referrer.includes(window.location.origin)) {
-        // If referrer is from same origin, try to go back
         navigate(-1);
       } else {
-        // Default to home
         navigate('/', {
           state: {
             cart: cartItems,
@@ -80,12 +73,9 @@ const Checkout = () => {
     }
   };
 
-  // Handle address selection from AddressSection
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
   };
-
-  // Handle adding new address
   const handleAddNewAddress = (newAddr) => {
     const newId = addresses.length + 1;
     const addressWithId = { ...newAddr, id: newId };
@@ -93,10 +83,8 @@ const Checkout = () => {
     setSelectedAddress(addressWithId);
   };
 
-  // Calculate totals based on cart data
   const calculateTotals = () => {
     const itemTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // Delivery fee: 30-40 (using 35 as default)
     const deliveryFee = 35;
     const grandTotal = itemTotal + deliveryFee;
 
@@ -130,11 +118,12 @@ const Checkout = () => {
     }
   };
 
-  const handleCompleteOrder = () => {
-    if (selectedPayment && (selectedPayment !== 'upi' || upiId)) {
-      setStep('success');
-    }
+  const handleCompleteOrder = (paymentResponse = null) => {
+    console.log("Razorpay Response:", paymentResponse);
+
+    setStep("success");
   };
+
 
   const handleReset = () => {
     setStep('address');
@@ -143,7 +132,6 @@ const Checkout = () => {
     setUpiId('');
   };
 
-  // Close order summary when step changes
   useEffect(() => {
     setShowOrderSummary(false);
   }, [step]);
@@ -164,7 +152,6 @@ const Checkout = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-50 border-b">
         <div className="px-4 py-3 flex items-center justify-between">
-          {/* Hide back button when address is selected (after clicking Deliver Here) or when viewing summary */}
           {!selectedAddress && !showOrderSummary && (
             <button
               onClick={handleBack}
@@ -174,11 +161,9 @@ const Checkout = () => {
               <span className="text-sm">Back</span>
             </button>
           )}
-          
-          {/* Spacer when back button is hidden */}
+
           {selectedAddress && !showOrderSummary && <div></div>}
-          
-          {/* Order Summary Toggle Button */}
+
           {!showOrderSummary && (
             <button
               onClick={() => setShowOrderSummary(!showOrderSummary)}
@@ -189,8 +174,7 @@ const Checkout = () => {
               <ChevronRight className={`w-4 h-4 transition-transform ${showOrderSummary ? 'rotate-90' : 'rotate-0'}`} />
             </button>
           )}
-          
-          {/* When summary is open, show close button */}
+
           {showOrderSummary && (
             <div className="w-full flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-800">Order Summary</h3>
@@ -205,13 +189,10 @@ const Checkout = () => {
         </div>
       </div>
 
-      {/* Desktop Header */}
       <div className="hidden  py-4 lg:block bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-8 py-3">
           <div className="flex items-center justify-between relative">
-            {/* Back button - left side */}
             <div className="flex-1">
-              {/* Hide back button when address is selected (after clicking Deliver Here) */}
               {!selectedAddress && (
                 <button
                   onClick={handleBack}
@@ -222,8 +203,7 @@ const Checkout = () => {
                 </button>
               )}
             </div>
-            
-            {/* Steps indicator - centered */}
+
             <div className="flex items-center gap-4 absolute left-1/2 transform -translate-x-1/2">
               <div className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${step === 'address' ? 'bg-green-500 text-white' : step === 'payment' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
@@ -243,17 +223,14 @@ const Checkout = () => {
                 </span>
               </div>
             </div>
-            
-            {/* Spacer for right side to balance layout */}
+
             <div className="flex-1"></div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="pt-16 lg:pt-4 pb-24 lg:pb-8">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          {/* Mobile Step Indicator - Simplified, just numbers */}
           <div className="lg:hidden py-3 mb-2">
             <div className="bg-white rounded-lg shadow-sm p-3 max-w-md mx-auto">
               <div className="flex items-center justify-center gap-3">
@@ -268,9 +245,7 @@ const Checkout = () => {
             </div>
           </div>
 
-          {/* Content Layout */}
           <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-8">
-            {/* Address/Payment Section - Always visible on desktop, conditionally on mobile */}
             <div className={`${showOrderSummary ? 'hidden lg:block lg:col-span-2' : 'block lg:col-span-2'} max-w-4xl mx-auto lg:mx-0 w-full`}>
               {step === 'address' ? (
                 <AddressSection
@@ -283,14 +258,14 @@ const Checkout = () => {
                 <PaymentSection
                   selectedPayment={selectedPayment}
                   onSelectPayment={setSelectedPayment}
-                  upiId={upiId}
-                  onUpiIdChange={setUpiId}
-                  onBack={() => setStep('address')}
+                  cartTotal={totals.grandTotal}
+                  onContinue={handleCompleteOrder}
                 />
+
+
               )}
             </div>
 
-            {/* Desktop Order Summary - Always visible on desktop */}
             <div className="hidden lg:block lg:col-span-1">
               <div className="sticky top-24">
                 <OrderSummary
@@ -307,17 +282,13 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* Mobile Order Summary Sidebar - Slides in from right */}
             <div className={`lg:hidden fixed inset-0 z-40 transition-transform duration-300 ease-out ${showOrderSummary ? 'translate-x-0' : 'translate-x-full'}`}>
-              {/* Overlay */}
-              <div 
+              <div
                 className="absolute inset-0 bg-black/50 lg:hidden"
                 onClick={() => setShowOrderSummary(false)}
               />
-              
-              {/* Sidebar Content */}
+
               <div className="absolute top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl overflow-hidden flex flex-col">
-                {/* Sidebar Content - Scrollable, accounting for header */}
                 <div className="flex-1 overflow-y-auto pt-16 pb-24">
                   <OrderSummary
                     cartItems={cartItems}
@@ -343,7 +314,6 @@ const Checkout = () => {
         </div>
       </div>
 
-      {/* Mobile Bottom Action Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t z-40">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
@@ -358,15 +328,14 @@ const Checkout = () => {
                 (step === 'payment' && (!selectedPayment || (selectedPayment === 'upi' && !upiId))) ||
                 cartItems.length === 0
               }
-              className={`px-5 py-2.5 rounded-lg font-semibold text-white text-sm ${
-                (step === 'address' && !selectedAddress) ||
+              className={`px-5 py-2.5 rounded-lg font-semibold text-white text-sm ${(step === 'address' && !selectedAddress) ||
                 (step === 'payment' && (!selectedPayment || (selectedPayment === 'upi' && !upiId))) ||
                 cartItems.length === 0
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700'
-              }`}
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700'
+                }`}
             >
-              {step === 'address' 
+              {step === 'address'
                 ? (selectedAddress ? 'Proceed to Payment' : 'Select Address')
                 : (selectedPayment ? 'Place Order' : 'Select Payment')
               }
