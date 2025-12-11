@@ -183,11 +183,11 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-4">
               {authenticated && (
                 <>
-                  <NavLink to="/profile/my-orders" className={navLinkClass}>
+                  <NavLink to="/Orders" className={navLinkClass}>
                     <Package size={18} />
                     <span>My Orders</span>
                   </NavLink>
-                  <NavLink to="/profile/wishlist" className={navLinkClass}>
+                  <NavLink to="/Wishlist" className={navLinkClass}>
                     <Heart size={18} />
                     <span>Wishlist</span>
                   </NavLink>

@@ -18,6 +18,8 @@ import HelpCenter from "./Components/Footer/HelpCenter";
 import Privacy from "./Components/Footer/Privacy";
 import TermsandConditions from "./Components/Footer/TermsandConditions";
 import AdminRoute from "./Routes/AdminRoute";
+import Orders from "./Components/Orders";
+import Whislist from "./Components/Whislist";
 // import Security from "./Components/Footer/Security"
 
 const App = () => {
@@ -43,6 +45,8 @@ const App = () => {
           </Route>
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/Orders" element={<Orders />} />
+          <Route path="/Wishlist" element={<Whislist />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/shop/:id" element={<ShopMenu />} />

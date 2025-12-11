@@ -30,12 +30,14 @@ const OrderSummary = ({
     }
   };
 
-  const DELIVERY_FEE = totals?.deliveryFee || 35;
+  const DELIVERY_FEE = totals?.deliveryFee || 39;
+  const GST = totals?.gst || 0;
 
   const finalTotals = totals || {
     itemTotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
     deliveryFee: DELIVERY_FEE,
-    grandTotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) + DELIVERY_FEE
+    gst: GST,
+    grandTotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) + DELIVERY_FEE + GST
   };
 
   return (
@@ -105,8 +107,10 @@ const OrderSummary = ({
             <span className="font-medium">₹{finalTotals.itemTotal.toLocaleString()}</span>
           </div>
 
+       
+
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Delivery Charge</span>
+            <span className="text-gray-600">Delivery Fee</span>
             <span className="font-medium">₹{finalTotals.deliveryFee}</span>
           </div>
 

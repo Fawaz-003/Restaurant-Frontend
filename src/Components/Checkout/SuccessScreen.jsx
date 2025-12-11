@@ -1,8 +1,10 @@
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SuccessScreen = ({ selectedAddress, totals, selectedPayment, onReset }) => {
+  const navigate = useNavigate();
+  
   const getPaymentMethodText = (method) => {
     switch (method) {
       case 'upi': return 'UPI Payment';
@@ -12,9 +14,29 @@ const SuccessScreen = ({ selectedAddress, totals, selectedPayment, onReset }) =>
     }
   };
 
+  const handleBack = () => {
+    if (onReset) {
+      onReset();
+    }
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex items-center justify-center p-4 min-h-screen">
+      {/* Back Button Header
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back</span>
+          </button>
+        </div>
+      </div> */}
+      
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-12 h-12 text-green-600" />

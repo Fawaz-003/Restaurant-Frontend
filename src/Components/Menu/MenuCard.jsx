@@ -1,18 +1,36 @@
-import React from 'react';
-import { Star, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Star, Plus, Heart } from 'lucide-react';
 
+const MenuItemCard = ({ item, onAddToCart, onToggleWishlist }) => {
+  const [wishlisted, setWishlisted] = useState(false);
 
+  const toggleWishlist = () => {
+    setWishlisted(!wishlisted);
+    if (onToggleWishlist) onToggleWishlist(item);
+  };
 
-const MenuItemCard = ({ item, onAddToCart }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group hover:-translate-y-1">
+    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group hover:-translate-y-1 relative">
+
+      <button
+        onClick={toggleWishlist}
+        className="absolute top-3 left-3 z-20 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:scale-110 transition"
+      >
+        <Heart
+          className={`w-5 h-5 transition-all ${
+            wishlisted ? "fill-red-500 text-red-500" : "text-gray-500"
+          }`}
+        />
+      </button>
+
       <div className="flex md:hidden">
-        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden">
+        <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-xl">
           <img
             src={item.image}
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
+
           <div className="absolute top-2 right-2 bg-white px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
             <span className="text-xs font-semibold">{item.rating}</span>
@@ -20,11 +38,9 @@ const MenuItemCard = ({ item, onAddToCart }) => {
         </div>
 
         <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
-          <div className="flex-1">
-            <h3 className="font-bold text-base text-gray-900 mb-1 truncate">{item.name}</h3>
-            <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
-          </div>
-          
+          <h3 className="font-bold text-base text-gray-900 mb-1 truncate">{item.name}</h3>
+          <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+
           <div className="flex items-center justify-between mt-2">
             <span className="text-lg font-bold text-gray-900">₹{item.price}</span>
             <button
@@ -45,7 +61,7 @@ const MenuItemCard = ({ item, onAddToCart }) => {
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
-  
+
           <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span className="text-sm font-semibold">{item.rating}</span>
@@ -55,7 +71,7 @@ const MenuItemCard = ({ item, onAddToCart }) => {
         <div className="p-4 flex-1 flex flex-col">
           <h3 className="font-bold text-lg text-gray-900 mb-1">{item.name}</h3>
           <p className="text-sm text-gray-600 mb-3 line-clamp-2 flex-1">{item.description}</p>
-          
+
           <div className="flex items-center justify-between mt-auto">
             <span className="text-2xl font-bold text-gray-900">₹{item.price}</span>
             <button
