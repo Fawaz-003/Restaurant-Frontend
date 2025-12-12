@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Package, CheckCircle, Clock, MapPin, ChevronRight, Calendar, XCircle, RotateCcw } from "lucide-react";
 import { useAppContext } from "../Context/AppContext";
 import axios from "axios";
-import CancelOrderModal from "./Orders/CancelOrderModal";
+import CancelOrderModal from "../Components/Orders/CancelOrderModal";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -438,7 +438,6 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Error State */}
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg z-50 max-w-sm">
           <div className="flex items-center gap-2">
@@ -453,7 +452,6 @@ const Orders = () => {
         </div>
       )}
 
-      {/* Cancel Order Modal */}
       <CancelOrderModal
         isOpen={cancelModal.isOpen}
         onClose={() => setCancelModal({ isOpen: false, order: null })}

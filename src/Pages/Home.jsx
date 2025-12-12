@@ -1,6 +1,6 @@
 import React from 'react';
-import BestSeller from '../Layout/Sections/BestSeller';
-import Shops from '../Layout/Sections/Shops';
+import BestSeller from '../Components/Home/BestSeller';
+import Shops from '../Components/Home/Shops';
 
 export default function Home() {
   return (

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../Context/AppContext";
-import ShopCard from "../../Components/Shop/ShopCard";
-import ShopDetailsModal from "../../Components/Shop/ShopDetailsModal";
+import ShopCard from "./ShopCard";
+import ShopDetailsModal from "./ShopDetailsModal";
 
 const Shops = () => {
   const navigate = useNavigate();

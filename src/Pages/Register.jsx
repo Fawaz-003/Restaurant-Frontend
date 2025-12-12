@@ -35,7 +35,7 @@ const Register = () => {
       }
 
       if (response?.token) {
-        navigate("/profile", { replace: true });
+        navigate("/", { replace: true });
       } else {
         navigate("/login", { replace: true });
       }

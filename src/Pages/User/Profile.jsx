@@ -8,9 +8,9 @@ import { AddressCard } from "../../Components/Profile/AddressCard";
 import { Toast } from "../../Components/Profile/Toast";
 import { Modal } from "../../Components/Profile/Modal";
 
-import { AddressForm } from "../../Components/Forms/AddressForm";
-import { ProfileForm } from "../../Components/Forms/ProfileForm";
-import { PasswordForm } from "../../Components/Forms/PasswordForm";
+import { AddressForm } from "../../Components/Profile/Forms/AddressForm";
+import { ProfileForm } from "../../Components/Profile/Forms/ProfileForm";
+import { PasswordForm } from "../../Components/Profile/Forms/PasswordForm";
 import { useAppContext } from "../../Context/AppContext";
 
 const Profile = () => {

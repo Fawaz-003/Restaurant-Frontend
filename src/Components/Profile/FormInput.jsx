@@ -11,7 +11,6 @@ export const FormInput = ({
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Determine padding classes
   const getPaddingClasses = () => {
     let padding = "";
     if (Icon && type === "password") padding = "px-10";

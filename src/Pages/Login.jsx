@@ -29,7 +29,7 @@ const Login = () => {
       if (response?.user) {
         setUserData(response.user);
       }
-      navigate("/profile", { replace: true });
+      navigate("/", { replace: true });
     } catch (submissionError) {
       setError(submissionError.message || "Failed to sign in. Try again.");
     } finally {

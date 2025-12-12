@@ -18,8 +18,8 @@ import HelpCenter from "./Components/Footer/HelpCenter";
 import Privacy from "./Components/Footer/Privacy";
 import TermsandConditions from "./Components/Footer/TermsandConditions";
 import AdminRoute from "./Routes/AdminRoute";
-import Orders from "./Components/Orders";
-import Whislist from "./Components/Whislist";
+import Orders from "./Pages/Orders";
+import Wishlist from "./Pages/Wishlist";
 // import Security from "./Components/Footer/Security"
 
 const App = () => {
@@ -46,7 +46,7 @@ const App = () => {
           <Route path="/seller-dashboard" element={<SellerDashboard />} />
           <Route path="/register" element={<Register />} />
           <Route path="/Orders" element={<Orders />} />
-          <Route path="/Wishlist" element={<Whislist />} />
+          <Route path="/Wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/shop/:id" element={<ShopMenu />} />

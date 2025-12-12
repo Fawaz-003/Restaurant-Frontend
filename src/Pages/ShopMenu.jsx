@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import MenuHeader from '../Components/Menu/MenuHeader';
-import MenuItemCard from '../Components/Menu/MenuCard';
-import CartSidebar from '../Components/Menu/CartSidebar';
+import MenuHeader from '../Components/ShopMenu/MenuHeader';
+import MenuItemCard from '../Components/ShopMenu/MenuCard';
+import CartSidebar from '../Components/ShopMenu/CartSidebar';
 import { useAppContext } from '../Context/AppContext';
 
 const ShopMenu = () => {
@@ -32,7 +32,6 @@ const ShopMenu = () => {
 
   const cartKey = userData?._id ? `cart_${userData._id}` : "cart_guest";
 
-  // Restore cart from storage and optional navigation state
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem(cartKey) || "[]");
     if (stored?.length) {
@@ -43,7 +42,6 @@ const ShopMenu = () => {
     }
   }, [location.state, cartKey]);
 
-  // Persist cart
   useEffect(() => {
     localStorage.setItem(cartKey, JSON.stringify(cart));
   }, [cart, cartKey]);
@@ -106,7 +104,6 @@ const ShopMenu = () => {
     return Array.from(unique);
   }, [normalizedMenu]);
 
-  // Filter best food items (simple pick of top rated items)
   const bestFoodItems = normalizedMenu
     .filter((item) => (item.rating ?? 0) >= 4.5)
     .slice(0, 6);

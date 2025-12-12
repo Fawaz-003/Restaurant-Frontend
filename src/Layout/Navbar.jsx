@@ -34,9 +34,9 @@ const Navbar = () => {
   useEffect(() => {
     if (authenticated && userData) {
       if (userData.role?.toLowerCase() === "admin") {
-        setProfilePath("/admin");
+        setProfilePath("/profile");
       } else if (userData.role?.toLowerCase() === "seller") {
-        setProfilePath("/seller-dashboard");
+        setProfilePath("/profile");
       } else {
         setProfilePath("/profile");
       }
