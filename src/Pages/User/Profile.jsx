@@ -81,16 +81,53 @@ const Profile = () => {
     }
   };
 
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('user_token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`${baseURL}/api/users/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUserData(data.user);
+      } else if (response.status === 401) {
+        logout();
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+
   useEffect(() => {
     const t = setTimeout(() => setIsLoaded(true), 100);
     
-    if (userData) {
-      fetchAddresses();
-      fetchUserPreferences();
-    }
+    const loadData = async () => {
+      const token = localStorage.getItem('user_token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      await fetchUserProfile();
+      await fetchAddresses();
+      await fetchUserPreferences();
+    };
+
+    loadData();
     
     return () => clearTimeout(t);
-  }, [userData, baseURL]);
+  }, [baseURL, navigate]);
 
   const handleSaveAddress = async (form) => {
     try {
@@ -101,13 +138,21 @@ const Profile = () => {
       
       const method = editingAddress ? 'PUT' : 'POST';
       
+      // Map form data to backend format
+      const addressData = {
+        label: form.label || "Home",
+        street: form.line1 || form.street || "",
+        address: form.line2 || form.address || form.city || "",
+        phone: form.phone || "",
+      };
+      
       const response = await fetch(url, {
         method,
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(addressData),
       });
       
       if (response.ok) {
@@ -119,7 +164,8 @@ const Profile = () => {
         setShowAddressModal(false);
         setEditingAddress(null);
       } else {
-        showToast("Failed to save address", "error");
+        const errorData = await response.json();
+        showToast(errorData.message || "Failed to save address", "error");
       }
     } catch (error) {
       console.error("Error saving address:", error);
@@ -166,7 +212,10 @@ const Profile = () => {
           'Authorization': `Bearer ${localStorage.getItem('user_token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          currentPassword: form.current,
+          newPassword: form.newPass,
+        }),
       });
       
       if (response.ok) {
@@ -475,7 +524,12 @@ const Profile = () => {
         >
           <AddressForm
             initialData={
-              editingAddress || {
+              editingAddress ? {
+                label: editingAddress.label || "Home",
+                line1: editingAddress.line1 || editingAddress.street || "",
+                line2: editingAddress.line2 || editingAddress.address || editingAddress.city || "",
+                phone: editingAddress.phone || "",
+              } : {
                 label: "Home",
                 line1: "",
                 line2: "",
@@ -495,7 +549,11 @@ const Profile = () => {
       {showProfileModal && (
         <Modal title="Edit Profile" onClose={() => setShowProfileModal(false)}>
           <ProfileForm
-            initialData={userData}
+            initialData={{
+              name: userData?.name || "",
+              email: userData?.email || "",
+              phone: userData?.phone || "",
+            }}
             onCancel={() => setShowProfileModal(false)}
             onSave={handleSaveProfile}
             isLoading={isSaving}

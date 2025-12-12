@@ -16,7 +16,7 @@ export const PasswordForm = ({ onCancel, onSave }) => {
     const newErrors = {};
     if (!form.current) newErrors.current = "Current password is required";
     if (!form.newPass) newErrors.newPass = "New password is required";
-    else if (form.newPass.length < 6) newErrors.newPass = "Password must be at least 6 characters";
+    else if (form.newPass.length < 8) newErrors.newPass = "Password must be at least 8 characters";
     if (!form.confirm) newErrors.confirm = "Please confirm your password";
     else if (form.newPass !== form.confirm) newErrors.confirm = "Passwords do not match";
     return newErrors;
@@ -93,7 +93,7 @@ export const PasswordForm = ({ onCancel, onSave }) => {
 
       <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
         <p className="text-sm text-blue-800">
-          <strong>Password requirements:</strong> At least 6 characters with a mix of letters and numbers.
+          <strong>Password requirements:</strong> At least 8 characters with a mix of letters and numbers.
         </p>
       </div>
 

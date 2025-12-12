@@ -28,7 +28,7 @@ export const AddressCard = ({ address, onEdit }) => (
       </button>
     </div>
 
-    <p className="text-slate-700">{address.line1}</p>
-    <p className="text-slate-600 text-sm">{address.line2}</p>
+    <p className="text-slate-700">{address.line1 || address.street}</p>
+    <p className="text-slate-600 text-sm">{address.line2 || address.address || address.city}</p>
   </div>
 );

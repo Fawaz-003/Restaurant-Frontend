@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Package, CheckCircle, Clock, MapPin, ChevronRight, Calendar } from "lucide-react";
+import { Package, CheckCircle, Clock, MapPin, ChevronRight, Calendar, XCircle, RotateCcw } from "lucide-react";
 import { useAppContext } from "../Context/AppContext";
 import axios from "axios";
+import CancelOrderModal from "./Orders/CancelOrderModal";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "" });
+  const [cancelModal, setCancelModal] = useState({ isOpen: false, order: null });
+  const [cancelling, setCancelling] = useState(false);
   const navigate = useNavigate();
   const { userData, token, baseURL } = useAppContext();
 
@@ -49,14 +52,18 @@ const Orders = () => {
       return {
         ...order,
         id: order.orderId || order.id || restaurantInfo.id || `ORD-${Date.now()}`,
+        orderId: order.orderId || order.id,
         total: order.totalAmount ?? order.total ?? 0,
-        status: order.orderStatus || order.status || "Processing",
+        status: order.deliveryStatus || order.orderStatus || order.status || "Pending",
+        orderStatus: order.orderStatus || "Pending",
+        deliveryStatus: order.deliveryStatus || "Pending",
         date: order.createdAt
           ? new Date(order.createdAt).toLocaleDateString()
           : order.date || "",
         deliveryTime: order.deliveryTime || "Estimated soon",
         address: order.deliveryAddress || order.address || firstItem.deliveryAddress || "",
         restaurantInfo,
+        shopId: order.shopId || restaurantInfo.id,
         items: (order.items || []).map((item) => ({
           ...item,
           image:
@@ -103,7 +110,45 @@ const Orders = () => {
 
   const showToast = (message) => {
     setToast({ show: true, message });
-    setTimeout(() => setToast({ show: false, message: "" }), 2000);
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
+
+  const handleCancelOrder = async (reason) => {
+    if (!cancelModal.order) return;
+
+    try {
+      setCancelling(true);
+      // Use orderId from the order object
+      const orderId = cancelModal.order.orderId || cancelModal.order.id;
+      const res = await axios.put(
+        `${baseURL}/api/users/orders/${orderId}/cancel`,
+        { reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (res.data.success) {
+        showToast("Order cancelled successfully. Admin and seller have been notified.");
+        setCancelModal({ isOpen: false, order: null });
+        // Refresh orders
+        await fetchOrders();
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      const errorMsg = error.response?.data?.message || "Failed to cancel order";
+      showToast(errorMsg);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const canCancelOrder = (order) => {
+    const status = order.deliveryStatus || order.orderStatus || order.status || "Pending";
+    return status !== "Delivered" && status !== "Cancelled";
+  };
+
+  const canReturnOrder = (order) => {
+    const status = order.deliveryStatus || order.orderStatus || order.status || "Pending";
+    return status === "Delivered";
   };
 
   const handleAddItemToCart = (item, order) => {
@@ -161,9 +206,10 @@ const Orders = () => {
   const getStatusColor = (status) => {
     const colors = {
       Delivered: "bg-green-100 text-green-800",
+      "Out for Delivery": "bg-purple-100 text-purple-800",
       Processing: "bg-blue-100 text-blue-800",
       Cancelled: "bg-red-100 text-red-800",
-      Shipped: "bg-purple-100 text-purple-800",
+      Shipped: "bg-indigo-100 text-indigo-800",
       Pending: "bg-yellow-100 text-yellow-800"
     };
     return colors[status] || "bg-gray-100 text-gray-800";
@@ -310,7 +356,6 @@ const Orders = () => {
                       </p>
                     </div>
 
-                    {/* Restaurant Info */}
                     <div className="mt-4 lg:mt-0">
                       <h4 className="font-medium text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Restaurant Details</h4>
                       <div className="flex items-start sm:items-center gap-3 mb-3">
@@ -340,7 +385,6 @@ const Orders = () => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
                     <button
                       onClick={() => handleAddToCart(order)}
@@ -348,6 +392,29 @@ const Orders = () => {
                     >
                       Order Again
                     </button>
+                    
+                    {canCancelOrder(order) && (
+                      <button
+                        onClick={() => setCancelModal({ isOpen: true, order })}
+                        className="px-4 py-2 sm:px-5 sm:py-2.5 border border-red-600 text-red-600 font-medium rounded-lg hover:bg-red-50 transition text-sm sm:text-base flex-1 sm:flex-none min-w-[120px] flex items-center justify-center gap-2"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Cancel Order
+                      </button>
+                    )}
+                    
+                    {canReturnOrder(order) && (
+                      <button
+                        onClick={() => {
+                          // For now, show a message. Can implement return functionality later
+                          showToast("Return functionality coming soon!");
+                        }}
+                        className="px-4 py-2 sm:px-5 sm:py-2.5 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition text-sm sm:text-base flex-1 sm:flex-none min-w-[120px] flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Return Order
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -356,14 +423,12 @@ const Orders = () => {
         </div>
       </div>
 
-      {/* Toast Notification */}
       {toast.show && (
-        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm z-50 mx-2 sm:mx-0 max-w-[90vw] sm:max-w-none">
+        <div className="fixed bottom-4 text-[11px] sm:bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg sm:text-[14px] z-50 mx-2 sm:mx-0 max-w-[90vw] sm:max-w-none">
           {toast.message}
         </div>
       )}
 
-      {/* Loading State */}
       {loading && (
         <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
           <div className="flex flex-col items-center">
@@ -387,6 +452,15 @@ const Orders = () => {
           </div>
         </div>
       )}
+
+      {/* Cancel Order Modal */}
+      <CancelOrderModal
+        isOpen={cancelModal.isOpen}
+        onClose={() => setCancelModal({ isOpen: false, order: null })}
+        onConfirm={handleCancelOrder}
+        orderId={cancelModal.order?.orderId || cancelModal.order?.id}
+        isLoading={cancelling}
+      />
     </div>
   );
 };

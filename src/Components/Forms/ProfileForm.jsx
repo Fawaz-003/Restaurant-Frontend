@@ -16,7 +16,9 @@ export const ProfileForm = ({ initialData, onCancel, onSave }) => {
     if (!form.name?.trim()) newErrors.name = "Name is required";
     if (!form.email?.trim()) newErrors.email = "Email is required";
     else if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = "Invalid email format";
-    if (!form.phone?.trim()) newErrors.phone = "Phone is required";
+    if (form.phone && form.phone.trim() && !/^\d{10}$/.test(form.phone.replace(/\D/g, ''))) {
+      newErrors.phone = "Invalid phone number format";
+    }
     return newErrors;
   };
 

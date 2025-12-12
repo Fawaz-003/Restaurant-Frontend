@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, NavLink } from "react-router-dom";
 import { useAppContext } from "../Context/AppContext";
+import NotificationPopup from "../Components/Notifications/NotificationPopup";
 import {
   MapPin,
   Menu,
@@ -191,6 +192,7 @@ const Navbar = () => {
                     <Heart size={18} />
                     <span>Wishlist</span>
                   </NavLink>
+                  <NotificationPopup />
                 </>
               )}
               
@@ -296,6 +298,9 @@ const Navbar = () => {
                       <Heart size={18} />
                       <span>Wishlist</span>
                     </NavLink>
+                    <div className="px-3 py-2">
+                      <NotificationPopup />
+                    </div>
                   </>
                 )}
 

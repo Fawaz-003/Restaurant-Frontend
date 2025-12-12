@@ -217,7 +217,7 @@ const Checkout = () => {
             items: orderPayload.items,
             totalAmount: orderPayload.total,
             paymentStatus: selectedPayment === "online" ? "Paid" : "Pending",
-            orderStatus: "Placed",
+            orderStatus: "Pending",
             deliveryAddress: orderPayload.address,
             restaurantInfo: orderPayload.restaurantInfo,
           },

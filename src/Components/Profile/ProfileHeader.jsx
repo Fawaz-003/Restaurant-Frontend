@@ -20,10 +20,12 @@ export const ProfileHeader = ({ user, onEditProfile, isLoaded }) => (
             <h1 className="text-xl font-bold mb-2">{user.name}</h1>
 
             <div className="space-y-1">
-              <p className="text-white/90 flex items-center gap-2 text-sm">
-                <Phone className="h-4 w-4" />
-                {user.phone}
-              </p>
+              {user.phone && (
+                <p className="text-white/90 flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4" />
+                  {user.phone}
+                </p>
+              )}
 
               <p className="text-white/90 flex items-center gap-2 text-sm">
                 <Mail className="h-4 w-4" />

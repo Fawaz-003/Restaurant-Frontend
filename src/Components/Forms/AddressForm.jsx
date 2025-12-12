@@ -12,8 +12,8 @@ export const AddressForm = ({ initialData, onCancel, onSave }) => {
     if (!form.label?.trim()) newErrors.label = "Label is required";
     if (!form.phone?.trim()) newErrors.phone = "Phone is required";
     else if (!/^\d{10}$/.test(form.phone.replace(/\D/g, ''))) newErrors.phone = "Invalid phone number";
-    if (!form.line1?.trim()) newErrors.line1 = "Address line 1 is required";
-    if (!form.line2?.trim()) newErrors.line2 = "Address line 2 is required";
+    if (!form.line1?.trim()) newErrors.line1 = "Street address is required";
+    if (!form.line2?.trim()) newErrors.line2 = "City is required";
     return newErrors;
   };
 

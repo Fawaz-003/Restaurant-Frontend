@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Layers, Users, List } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Layers, Users, List, Bell } from 'lucide-react';
 import DashboardHome from './Actions/DashboardHome';
 import ShopManagement from './Actions/ShopManagement';
 import CategoryManagement from './Actions/CategoryManagement';
 import UserManagement from './Actions/UserManagement';
+import NotificationSidebar from '../../Components/Notifications/NotificationSidebar';
 
 export const menuItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard, component: DashboardHome },
@@ -16,6 +17,7 @@ export const menuItems = [
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -24,9 +26,18 @@ const AdminDashboard = () => {
           {/* Sidebar */}
           <aside className="w-64 flex-shrink-0 self-start sticky top-24">
             <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm h-full">
-              <h3 className="px-3 text-xs font-semibold uppercase text-slate-500">
-                Admin Menu
-              </h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="px-3 text-xs font-semibold uppercase text-slate-500">
+                  Admin Menu
+                </h3>
+                <button
+                  onClick={() => setIsNotificationOpen(true)}
+                  className="relative p-2 text-slate-600 hover:text-orange-600 transition-colors rounded-lg hover:bg-slate-50"
+                  title="Notifications"
+                >
+                  <Bell className="h-5 w-5" />
+                </button>
+              </div>
               <nav className="flex flex-col">
                 {menuItems.map((item) => (
                   <button
@@ -54,6 +65,12 @@ const AdminDashboard = () => {
           </main>
         </div>
       </div>
+      
+      {/* Notification Sidebar */}
+      <NotificationSidebar 
+        isOpen={isNotificationOpen} 
+        onClose={() => setIsNotificationOpen(false)} 
+      />
     </div>
   );
 };
