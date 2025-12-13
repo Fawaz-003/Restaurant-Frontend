@@ -192,7 +192,7 @@ const Navbar = () => {
                     <Heart size={18} />
                     <span>Wishlist</span>
                   </NavLink>
-                  <NotificationPopup />
+                  {/* <NotificationPopup /> */}
                 </>
               )}
               
@@ -298,9 +298,9 @@ const Navbar = () => {
                       <Heart size={18} />
                       <span>Wishlist</span>
                     </NavLink>
-                    <div className="px-3 py-2">
+                    {/* <div className="px-3 py-2">
                       <NotificationPopup />
-                    </div>
+                    </div> */}
                   </>
                 )}
 

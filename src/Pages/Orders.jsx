@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Package, CheckCircle, Clock, MapPin, ChevronRight, Calendar, XCircle, RotateCcw } from "lucide-react";
+import {
+  Package,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Calendar,
+  XCircle,
+  RotateCcw,
+} from "lucide-react";
 import { useAppContext } from "../Context/AppContext";
 import axios from "axios";
 import CancelOrderModal from "../Components/Orders/CancelOrderModal";
@@ -12,6 +20,7 @@ const Orders = () => {
   const [toast, setToast] = useState({ show: false, message: "" });
   const [cancelModal, setCancelModal] = useState({ isOpen: false, order: null });
   const [cancelling, setCancelling] = useState(false);
+  const [animateProgress, setAnimateProgress] = useState(false);
   const navigate = useNavigate();
   const { userData, token, baseURL } = useAppContext();
 
@@ -60,7 +69,6 @@ const Orders = () => {
         date: order.createdAt
           ? new Date(order.createdAt).toLocaleDateString()
           : order.date || "",
-        deliveryTime: order.deliveryTime || "Estimated soon",
         address: order.deliveryAddress || order.address || firstItem.deliveryAddress || "",
         restaurantInfo,
         shopId: order.shopId || restaurantInfo.id,
@@ -96,6 +104,11 @@ const Orders = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(normalizeOrders(res.data?.orders || []));
+      
+      // Trigger animation after a short delay
+      setTimeout(() => {
+        setAnimateProgress(true);
+      }, 300);
     } catch (err) {
       setError("Failed to load orders");
       setOrders([]);
@@ -106,6 +119,9 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
+    
+    // Reset animation when component mounts
+    setAnimateProgress(false);
   }, [token, baseURL]);
 
   const showToast = (message) => {
@@ -118,7 +134,6 @@ const Orders = () => {
 
     try {
       setCancelling(true);
-      // Use orderId from the order object
       const orderId = cancelModal.order.orderId || cancelModal.order.id;
       const res = await axios.put(
         `${baseURL}/api/users/orders/${orderId}/cancel`,
@@ -129,7 +144,6 @@ const Orders = () => {
       if (res.data.success) {
         showToast("Order cancelled successfully. Admin and seller have been notified.");
         setCancelModal({ isOpen: false, order: null });
-        // Refresh orders
         await fetchOrders();
       }
     } catch (error) {
@@ -206,19 +220,174 @@ const Orders = () => {
   const getStatusColor = (status) => {
     const colors = {
       Delivered: "bg-green-100 text-green-800",
-      "Out for Delivery": "bg-purple-100 text-purple-800",
-      Processing: "bg-blue-100 text-blue-800",
+      "Out for Delivery": "bg-yellow-100 text-yellow-800",
+      Processing: "bg-orange-100 text-orange-800",
       Cancelled: "bg-red-100 text-red-800",
       Shipped: "bg-indigo-100 text-indigo-800",
-      Pending: "bg-yellow-100 text-yellow-800"
+      Pending: "bg-yellow-100 text-yellow-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getStatusIcon = (status) => {
-    return status === "Delivered" ? 
-      <CheckCircle className="w-4 h-4" /> : 
-      <Clock className="w-4 h-4" />;
+    return status === "Delivered" ? (
+      <CheckCircle className="w-4 h-4" />
+    ) : (
+      <Clock className="w-4 h-4" />
+    );
+  };
+
+  const steps = ["Pending", "Processing", "Out for Delivery", "Delivered"];
+  
+  const getStatusProgress = (status) => {
+    if (!status) return { index: 0, percentage: 0 };
+    if (status === "Cancelled") return { index: -1, percentage: 100 };
+    
+    const stepIndex = steps.findIndex(s => s.toLowerCase() === status.toLowerCase());
+    const index = stepIndex >= 0 ? stepIndex : 0;
+    const percentage = (index / (steps.length - 1)) * 100;
+    
+    return { index, percentage };
+  };
+
+  const ProgressBar = ({ status, orderId }) => {
+    const { index: currentIndex, percentage: targetPercentage } = getStatusProgress(status);
+    const isCancelled = status === "Cancelled";
+    
+    const progressColor = isCancelled 
+      ? "bg-red-500" 
+      : status === "Delivered" 
+        ? "bg-green-500" 
+        : "bg-orange-500";
+
+    const [progressWidth, setProgressWidth] = useState(0);
+
+    useEffect(() => {
+      if (animateProgress) {
+        setProgressWidth(0);
+        setTimeout(() => {
+          setProgressWidth(targetPercentage);
+        }, 100);
+      }
+    }, [animateProgress, targetPercentage, orderId]);
+
+    return (
+      <div className="mt-3">
+        <div className="w-full">
+          <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="absolute inset-0 bg-gray-200 rounded-full" />
+            
+            <div
+              className={`absolute top-0 left-0 h-2 ${progressColor} rounded-full transition-all duration-1500 ease-out`}
+              style={{ 
+                width: `${progressWidth}%`,
+                transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            />
+            
+            {progressWidth > 0 && progressWidth < 100 && !isCancelled && (
+              <div 
+                className="absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"
+                style={{ animationDelay: '500ms' }}
+              />
+            )}
+          </div>
+
+          <div className="flex items-center justify-between mt-3 relative">
+            {steps.map((step, idx) => {
+              const isCompleted = !isCancelled && idx <= currentIndex;
+              const isCurrent = !isCancelled && idx === currentIndex;
+              
+              let circleStyle = "bg-white border border-gray-300 text-gray-600";
+              let textStyle = "text-gray-600";
+              
+              if (isCancelled) {
+                circleStyle = "bg-white border border-red-400 text-red-600";
+                textStyle = "text-red-600";
+              } else if (isCompleted) {
+                circleStyle = status === "Delivered" 
+                  ? "bg-green-500 text-white" 
+                  : "bg-orange-500 text-white";
+                textStyle = status === "Delivered" ? "text-green-600" : "text-orange-600";
+              }
+              
+              const shouldAnimate = animateProgress && isCompleted;
+              
+              return (
+                <div key={step} className="flex-1 flex flex-col items-center min-w-0 relative">
+                  {idx > 0 && (
+                    <div className="absolute top-3 -left-1/2 w-full h-0.5 bg-gray-300 -z-10">
+                      {isCompleted && (
+                        <div 
+                          className={`h-full ${progressColor} transition-all duration-1000 ease-out`}
+                          style={{ 
+                            width: shouldAnimate ? '100%' : '0%',
+                            transitionDelay: `${idx * 200}ms`
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
+                  
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${circleStyle} transition-all duration-700 ease-out ${
+                      isCurrent ? "ring-2 ring-opacity-50 " + (status === "Delivered" ? "ring-green-300" : "ring-orange-300") : ""
+                    }`}
+                    style={{ 
+                      transitionDelay: `${idx * 200}ms`,
+                      transform: shouldAnimate ? 'scale(1)' : 'scale(0.8)',
+                      opacity: shouldAnimate ? 1 : 0.7
+                    }}
+                  >
+                    {isCompleted ? (
+                      <CheckCircle className="w-3.5 h-3.5 text-white transition-all duration-300" />
+                    ) : (
+                      <span className="text-[15px] font-medium">{idx + 1}</span>
+                    )}
+                  </div>
+                  
+                  <div 
+                    className={`mt-1 text-[8px] font-bold sm:text-sm text-center truncate w-full px-1 ${textStyle} transition-all duration-500`}
+                    style={{ transitionDelay: `${idx * 300}ms` }}
+                  >
+                    {step}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Cancelled indicator */}
+            {isCancelled && (
+              <div 
+                className="absolute right-0 -top-6 flex items-center gap-1 opacity-0 animate-fadeIn"
+                style={{ animationDelay: '800ms', animationFillMode: 'forwards' }}
+              >
+                <XCircle className="w-4 h-4 text-red-600" />
+                <span className="text-xs text-red-600 font-medium">Cancelled</span>
+              </div>
+            )}
+          </div>
+
+          {/* Current status display */}
+          {/* <div 
+            className="mt-4 text-center opacity-0 animate-fadeIn"
+            style={{ animationDelay: '1200ms', animationFillMode: 'forwards' }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100">
+              <span 
+                className={`w-2 h-2 rounded-full ${progressColor} animate-pulse`}
+                style={{ animationDelay: '1400ms' }}
+              />
+              <span className="text-sm font-medium text-gray-700">
+                Current Status: <span className={isCancelled ? 'text-red-600' : status === 'Delivered' ? 'text-green-600' : 'text-orange-600'}>
+                  {status}
+                </span>
+              </span>
+            </div>
+          </div> */}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -256,21 +425,20 @@ const Orders = () => {
                           <h2 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                             Order #{order.id.length > 20 ? `${order.id.substring(0, 20)}...` : order.id}
                           </h2>
-                          <span className={`px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1.5 ${getStatusColor(order.status)} w-fit`}>
+                          {/* <span className={`px-2.5 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1.5 ${getStatusColor(order.status)} w-fit`}>
                             {getStatusIcon(order.status)}
                             {order.status}
-                          </span>
+                          </span> */}
                         </div>
                         <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             <span className="truncate">{order.date}</span>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            <span className="truncate">{order.deliveryTime}</span>
-                          </div>
                         </div>
+
+                        {/* Animated Progress Bar */}
+                        <ProgressBar status={order.status} orderId={order.id} />
                       </div>
                       <div className="text-left sm:text-right">
                         <p className="text-xl sm:text-2xl font-bold text-gray-900">₹{order.total}</p>
@@ -286,55 +454,53 @@ const Orders = () => {
                     <h3 className="font-medium text-gray-900 text-sm sm:text-base">Items Ordered</h3>
                     <span className="text-xs sm:text-sm text-gray-600">{order.items.length} items</span>
                   </div>
-                  
-                  <div className="space-y-3 sm:space-y-4">
+
+                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2">
                     {order.items.map((item, index) => (
                       <div
                         key={index}
-                        className="flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition"
                         onClick={() => handleAddItemToCart(item, order)}
+                        className="min-w-[210px] sm:min-w-[220px] max-w-[240px] flex-shrink-0 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition p-3"
                       >
-                        {/* Item Image */}
-                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-                          {item.image ? (
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-full h-full object-cover rounded-lg"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-rose-100 rounded-lg flex items-center justify-center">
-                              <span className="text-xl sm:text-2xl">🍛</span>
-                            </div>
-                          )}
-                          <div className="absolute -top-1.5 -left-1.5 w-5 h-5 sm:w-6 sm:h-6 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                            {item.quantity}
+                        <div className="flex items-start gap-3">
+                          {/* Image */}
+                          <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-orange-50 flex items-center justify-center">
+                            {item.image ? (
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-orange-100 flex items-center justify-center">
+                                <span className="text-lg">🍛</span>
+                              </div>
+                            )}
                           </div>
-                        </div>
 
-                        {/* Item Details */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">
-                            {item.name}
-                          </h4>
-                          <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mt-1.5 sm:mt-2">
-                            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                              <span className="text-xs sm:text-sm text-gray-600">₹{item.price} each</span>
-                              <span className="text-gray-300 hidden xs:inline">•</span>
-                              <span className="text-xs sm:text-sm font-medium text-gray-900">
-                                ₹{item.price * item.quantity}
-                              </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <h4 className="font-medium text-gray-900 text-sm truncate">{item.name}</h4>
+                              <span className="text-xs text-gray-600 whitespace-nowrap">₹{item.price} each</span>
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleAddItemToCart(item, order);
-                              }}
-                              className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded-lg transition w-fit"
-                            >
-                              Add to Cart
-                            </button>
+
+                            <div className="mt-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-gray-900">₹{item.price * item.quantity}</span>
+                                <span className="text-xs text-gray-500">qty {item.quantity}</span>
+                              </div>
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAddItemToCart(item, order);
+                                }}
+                                className="mt-3 w-full bg-orange-600 text-white text-[11px] font-medium py-1  rounded-md hover:bg-orange-700 transition"
+                              >
+                                Add to Cart
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -342,10 +508,8 @@ const Orders = () => {
                   </div>
                 </div>
 
-                {/* Order Footer */}
                 <div className="p-4 sm:p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                    {/* Address */}
                     <div>
                       <div className="flex items-center gap-2 mb-2 sm:mb-3">
                         <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
@@ -359,7 +523,7 @@ const Orders = () => {
                     <div className="mt-4 lg:mt-0">
                       <h4 className="font-medium text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">Restaurant Details</h4>
                       <div className="flex items-start sm:items-center gap-3 mb-3">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                           {order.restaurantInfo?.image || order.items?.[0]?.image ? (
                             <img
                               src={order.restaurantInfo?.image || order.items?.[0]?.image}
@@ -392,7 +556,7 @@ const Orders = () => {
                     >
                       Order Again
                     </button>
-                    
+
                     {canCancelOrder(order) && (
                       <button
                         onClick={() => setCancelModal({ isOpen: true, order })}
@@ -402,11 +566,10 @@ const Orders = () => {
                         Cancel Order
                       </button>
                     )}
-                    
+
                     {canReturnOrder(order) && (
                       <button
                         onClick={() => {
-                          // For now, show a message. Can implement return functionality later
                           showToast("Return functionality coming soon!");
                         }}
                         className="px-4 py-2 sm:px-5 sm:py-2.5 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition text-sm sm:text-base flex-1 sm:flex-none min-w-[120px] flex items-center justify-center gap-2"
